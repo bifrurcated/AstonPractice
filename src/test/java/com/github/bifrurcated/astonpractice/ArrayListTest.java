@@ -1,6 +1,7 @@
 package com.github.bifrurcated.astonpractice;
 
 import com.github.bifrurcated.astonpractice.sort.BubbleSort;
+import com.github.bifrurcated.astonpractice.sort.MergeSort;
 import com.github.bifrurcated.astonpractice.sort.QuickSort;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -155,6 +156,13 @@ class ArrayListTest {
         list.addAll(java.util.List.of("3","1","2","4","5"));
         list.sort(String::compareTo, new QuickSort<>());
         assertArrayEquals(java.util.List.of("1","2","3","4","5").toArray(), list.toArray());
+    }
+
+    @Test
+    void testMergeSort() {
+        list.addAll(java.util.List.of("8", "2", "5", "3", "4", "7", "6", "1"));
+        list.sort(String::compareTo, new MergeSort<>());
+        assertArrayEquals(java.util.List.of("1", "2", "3", "4", "5", "6", "7", "8").toArray(), list.toArray());
     }
 
     //@Test

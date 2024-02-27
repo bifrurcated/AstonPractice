@@ -1,6 +1,5 @@
 package com.github.bifrurcated.astonpractice;
 
-import com.github.bifrurcated.astonpractice.sort.BubbleSort;
 import com.github.bifrurcated.astonpractice.sort.Consumer3;
 import com.github.bifrurcated.astonpractice.sort.QuickSort;
 
@@ -120,6 +119,7 @@ public class ArrayList<E> implements List<E> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void sort(Comparator<? super E> c, Consumer3<E[], Integer, Comparator<? super E>> sort) {
         if (isEmpty()) return;
         sort.accept((E[]) data, size, c);
