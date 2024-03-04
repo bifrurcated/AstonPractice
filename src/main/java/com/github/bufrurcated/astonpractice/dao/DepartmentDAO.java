@@ -74,25 +74,20 @@ public class DepartmentDAO extends AbstractDao implements Dao<Department, Long> 
 
     @Override
     public void delete(Long id) throws SQLException {
-        try {
+        String sql1 = "DELETE FROM employee_department WHERE department_id = ?";
+        String sql2 = "DELETE FROM department WHERE id = ?";
+        try (PreparedStatement preparedStatement1 = connection.prepareStatement(sql1);
+             PreparedStatement preparedStatement2 = connection.prepareStatement(sql2)) {
             connection.setAutoCommit(false);
-            String sql1 = "DELETE FROM employee_department WHERE department_id = ?";
-            String sql2 = "DELETE FROM department WHERE id = ?";
-            PreparedStatement preparedStatement1 = connection.prepareStatement(sql1);
-            PreparedStatement preparedStatement2 = connection.prepareStatement(sql2);
             preparedStatement1.setLong(1, id);
             preparedStatement2.setLong(1, id);
             preparedStatement1.execute();
             int rowsDeleted = preparedStatement2.executeUpdate();
             if (rowsDeleted == 0) {
                 connection.rollback();
-                preparedStatement1.close();
-                preparedStatement2.close();
                 throw new NotFoundSQLException();
             }
             connection.commit();
-            preparedStatement1.close();
-            preparedStatement2.close();
         } catch (SQLException e) {
             connection.rollback();
             throw new SQLException(e);
