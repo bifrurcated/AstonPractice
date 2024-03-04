@@ -27,7 +27,7 @@ public class DepartmentDAO extends AbstractDao implements Dao<Department, Long> 
         try (Statement statement = connection.createStatement()) {
             String sql = "SELECT id, dpt_name FROM department";
             ResultSet resultSet = statement.executeQuery(sql);
-            if (resultSet.getFetchSize() < 1) {
+            if (!resultSet.isBeforeFirst()) {
                 throw new NotFoundSQLException();
             }
             List<Department> departmentList = new ArrayList<>();

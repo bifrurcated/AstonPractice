@@ -28,7 +28,7 @@ public class EmplDepartDAO extends AbstractDao implements Dao<EmplDepart, EmplDe
         try (Statement statement = connection.createStatement()) {
             String sql = "SELECT employee_id, department_id FROM employee_department";
             ResultSet resultSet = statement.executeQuery(sql);
-            if (resultSet.getFetchSize() < 1) {
+            if (!resultSet.isBeforeFirst()) {
                 throw new NotFoundSQLException();
             }
             List<EmplDepart> emplDeparts = new ArrayList<>();
@@ -56,7 +56,7 @@ public class EmplDepartDAO extends AbstractDao implements Dao<EmplDepart, EmplDe
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql.toString())) {
             preparedStatement.setLong(1, id);
             ResultSet resultSet = preparedStatement.executeQuery();
-            if (resultSet.getFetchSize() < 1) {
+            if (!resultSet.isBeforeFirst()) {
                 throw new NotFoundSQLException();
             }
             List<EmplDepart> emplDeparts = new ArrayList<>();

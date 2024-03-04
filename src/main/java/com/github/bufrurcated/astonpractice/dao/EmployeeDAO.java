@@ -29,7 +29,7 @@ public class EmployeeDAO extends AbstractDao implements Dao<Employee, Long> {
         try (Statement statement = connection.createStatement()) {
             String sql = "SELECT id, first_name, last_name, age FROM employee";
             ResultSet resultSet = statement.executeQuery(sql);
-            if (resultSet.getFetchSize() < 1) {
+            if (!resultSet.isBeforeFirst()) {
                 throw new NotFoundSQLException();
             }
             List<Employee> employeeList = new ArrayList<>();
