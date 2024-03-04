@@ -29,8 +29,7 @@ public class EmplDepartServlet extends HttpServlet {
     private final EmplDepartMapper emplDepartMapper = new EmplDepartMapper();
 
     @Override
-    public void init(ServletConfig config) throws ServletException {
-        super.init(config);
+    public void init() throws ServletException {
         databaseSource = new DatabaseSource();
         var connection = databaseSource.getConnection();
         var dao = new EmplDepartDAO(connection);

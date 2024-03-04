@@ -2,16 +2,11 @@ package com.github.bufrurcated.astonpractice.api;
 
 import com.github.bufrurcated.astonpractice.dao.EmployeeDAO;
 import com.github.bufrurcated.astonpractice.db.DatabaseSource;
-import com.github.bufrurcated.astonpractice.dto.RequestCreateEmployee;
-import com.github.bufrurcated.astonpractice.dto.RequestUpdateEmployee;
-import com.github.bufrurcated.astonpractice.dto.ResponseEmployee;
 import com.github.bufrurcated.astonpractice.entity.Employee;
 import com.github.bufrurcated.astonpractice.errors.ResponseStatusException;
 import com.github.bufrurcated.astonpractice.mapper.EmployeeMapper;
 import com.github.bufrurcated.astonpractice.service.EmployeeService;
-import com.github.bufrurcated.astonpractice.utils.InitData;
 import com.github.bufrurcated.astonpractice.utils.Parse;
-import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -31,8 +26,7 @@ public class EmployeeServlet extends HttpServlet {
     private final EmployeeMapper employeeMapper = new EmployeeMapper();
 
     @Override
-    public void init(ServletConfig config) throws ServletException {
-        super.init(config);
+    public void init() throws ServletException {
         databaseSource = new DatabaseSource();
         var connection = databaseSource.getConnection();
         var dao = new EmployeeDAO(connection);

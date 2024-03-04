@@ -2,15 +2,12 @@ package com.github.bufrurcated.astonpractice.api;
 
 import com.github.bufrurcated.astonpractice.dao.DepartmentDAO;
 import com.github.bufrurcated.astonpractice.db.DatabaseSource;
-import com.github.bufrurcated.astonpractice.dto.RequestCreateDepartment;
-import com.github.bufrurcated.astonpractice.dto.RequestUpdateDepartment;
 import com.github.bufrurcated.astonpractice.dto.ResponseDepartment;
 import com.github.bufrurcated.astonpractice.entity.Department;
 import com.github.bufrurcated.astonpractice.errors.ResponseStatusException;
 import com.github.bufrurcated.astonpractice.mapper.DepartmentMapper;
 import com.github.bufrurcated.astonpractice.service.DepartmentService;
 import com.github.bufrurcated.astonpractice.utils.Parse;
-import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -30,8 +27,7 @@ public class DepartmentServlet extends HttpServlet {
     private final DepartmentMapper departmentMapper = new DepartmentMapper();
 
     @Override
-    public void init(ServletConfig config) throws ServletException {
-        super.init(config);
+    public void init() throws ServletException {
         databaseSource = new DatabaseSource();
         var connection = databaseSource.getConnection();
         var dao = new DepartmentDAO(connection);

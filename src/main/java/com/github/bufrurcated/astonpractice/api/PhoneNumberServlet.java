@@ -2,18 +2,11 @@ package com.github.bufrurcated.astonpractice.api;
 
 import com.github.bufrurcated.astonpractice.dao.PhoneNumberDAO;
 import com.github.bufrurcated.astonpractice.db.DatabaseSource;
-import com.github.bufrurcated.astonpractice.dto.RequestCreatePhoneNumber;
-import com.github.bufrurcated.astonpractice.dto.RequestUpdateEmployee;
-import com.github.bufrurcated.astonpractice.dto.RequestUpdatePhoneNumber;
-import com.github.bufrurcated.astonpractice.dto.ResponsePhoneNumber;
-import com.github.bufrurcated.astonpractice.entity.Employee;
 import com.github.bufrurcated.astonpractice.entity.PhoneNumber;
 import com.github.bufrurcated.astonpractice.errors.ResponseStatusException;
 import com.github.bufrurcated.astonpractice.mapper.PhoneNumberMapper;
 import com.github.bufrurcated.astonpractice.service.PhoneNumberService;
-import com.github.bufrurcated.astonpractice.utils.InitData;
 import com.github.bufrurcated.astonpractice.utils.Parse;
-import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -33,8 +26,7 @@ public class PhoneNumberServlet extends HttpServlet {
     private final PhoneNumberMapper phoneNumberMapper = new PhoneNumberMapper();
 
     @Override
-    public void init(ServletConfig config) throws ServletException {
-        super.init(config);
+    public void init() throws ServletException {
         databaseSource = new DatabaseSource();
         var connection = databaseSource.getConnection();
         var dao = new PhoneNumberDAO(connection);
