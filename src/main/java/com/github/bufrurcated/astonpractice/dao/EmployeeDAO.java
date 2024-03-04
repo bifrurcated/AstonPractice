@@ -77,25 +77,24 @@ public class EmployeeDAO extends AbstractDao implements Dao<Employee, Long> {
 
     @Override
     public void delete(Long id) throws SQLException {
-        try {
+        String sql1 = "DELETE FROM employee_department WHERE employee_id = ?";
+        String sql2 = "DELETE FROM phone_numbers WHERE employee_id = ?";
+        String sql3 = "DELETE FROM employee WHERE id = ?";
+        try (PreparedStatement preparedStatement1 = connection.prepareStatement(sql1);
+             PreparedStatement preparedStatement2 = connection.prepareStatement(sql2);
+             PreparedStatement preparedStatement3 = connection.prepareStatement(sql3)) {
             connection.setAutoCommit(false);
-            String sql1 = "DELETE FROM employee_department WHERE employee_id = ?";
-            String sql2 = "DELETE FROM employee WHERE id = ?";
-            PreparedStatement preparedStatement1 = connection.prepareStatement(sql1);
-            PreparedStatement preparedStatement2 = connection.prepareStatement(sql2);
             preparedStatement1.setLong(1, id);
             preparedStatement2.setLong(1, id);
+            preparedStatement3.setLong(1, id);
             preparedStatement1.execute();
-            int rowsDeleted = preparedStatement2.executeUpdate();
+            preparedStatement2.execute();
+            int rowsDeleted = preparedStatement3.executeUpdate();
             if (rowsDeleted == 0) {
                 connection.rollback();
-                preparedStatement1.close();
-                preparedStatement2.close();
                 throw new NotFoundSQLException();
             }
             connection.commit();
-            preparedStatement1.close();
-            preparedStatement2.close();
         } catch (SQLException e) {
             connection.rollback();
             throw new SQLException(e);
