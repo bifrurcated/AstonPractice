@@ -17,6 +17,10 @@ public class EmplDepartService {
     public void add(EmplDepart emplDepart) throws ResponseStatusException {
         try {
             dao.save(emplDepart);
+        } catch (EmployeeNotFoundSQLException e) {
+            throw new EmployeeNotFoundError();
+        } catch (DepartmentNotFoundSQLException e) {
+            throw new DepartmentNotFoundError();
         } catch (SQLException e) {
             throw new SQLError(e.getMessage());
         }

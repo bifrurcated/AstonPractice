@@ -2,6 +2,7 @@ package com.github.bufrurcated.astonpractice.api;
 
 import com.github.bufrurcated.astonpractice.dao.PhoneNumberDAO;
 import com.github.bufrurcated.astonpractice.db.DatabaseSource;
+import com.github.bufrurcated.astonpractice.dto.ResponsePhoneNumber;
 import com.github.bufrurcated.astonpractice.entity.PhoneNumber;
 import com.github.bufrurcated.astonpractice.errors.ResponseStatusException;
 import com.github.bufrurcated.astonpractice.mapper.PhoneNumberMapper;
@@ -22,14 +23,12 @@ import java.util.Optional;
 @WebServlet(urlPatterns = {"/api/v1/phone-numbers/*"})
 public class PhoneNumberServlet extends HttpServlet {
     private PhoneNumberService service;
-    private DatabaseSource databaseSource;
     private final PhoneNumberMapper phoneNumberMapper = new PhoneNumberMapper();
 
     @Override
     public void init() throws ServletException {
-        databaseSource = new DatabaseSource();
-        var connection = databaseSource.getConnection();
-        var dao = new PhoneNumberDAO(connection);
+        var sessionFactory = DatabaseSource.getSessionFactory();
+        var dao = new PhoneNumberDAO(sessionFactory);
         service = new PhoneNumberService(dao);
     }
 
@@ -54,28 +53,27 @@ public class PhoneNumberServlet extends HttpServlet {
         } else if (employeeId.isPresent()) {
             var strId = employeeId.get()[0];
             long id = Parse.stringToLong(resp, strId);
-            List<PhoneNumber> phoneNumbers;
+            List<ResponsePhoneNumber> responsePhoneNumbers;
             try {
-                phoneNumbers = service.getByEmployeeId(id);
+                responsePhoneNumbers = service.getByEmployeeId(id).stream().map(phoneNumberMapper::map).toList();
             } catch (ResponseStatusException exception) {
                 resp.sendError(exception.getStatus(), exception.getReason());
                 throw new RuntimeException(exception.getMessage());
             }
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.setContentType("application/json");
-            resp.getWriter().write(new JSONArray(phoneNumbers).toString());
+            resp.getWriter().write(new JSONArray(responsePhoneNumbers).toString());
         } else {
-            List<PhoneNumber> phoneNumbers;
+            List<ResponsePhoneNumber> responsePhoneNumbers;
             try {
-                phoneNumbers = service.getAll();
+                responsePhoneNumbers = service.getAll().stream().map(phoneNumberMapper::map).toList();
             } catch (ResponseStatusException exception) {
                 resp.sendError(exception.getStatus(), exception.getReason());
                 throw new RuntimeException(exception.getMessage());
             }
-            var phoneNumberList = phoneNumbers.stream().map(phoneNumberMapper::map).toList();
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.setContentType("application/json");
-            resp.getWriter().write(new JSONArray(phoneNumberList).toString());
+            resp.getWriter().write(new JSONArray(responsePhoneNumbers).toString());
         }
     }
 
@@ -145,10 +143,5 @@ public class PhoneNumberServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.getWriter().write("Phone numbers deleted");
         }
-    }
-
-    @Override
-    public void destroy() {
-        databaseSource.shutdown();
     }
 }

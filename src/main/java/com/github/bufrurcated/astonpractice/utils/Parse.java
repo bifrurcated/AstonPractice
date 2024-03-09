@@ -89,9 +89,17 @@ public class Parse {
     public static RequestEmplDepart jsonToEmplDepart(HttpServletResponse resp, String json) throws IOException {
         try {
             JSONObject jsonObject = new JSONObject(json);
+            Long employeeId = null;
+            Long departmentId = null;
+            if (!jsonObject.isNull("employee_id")) {
+                employeeId = jsonObject.getLong("employee_id");
+            }
+            if (!jsonObject.isNull("department_id")) {
+                departmentId = jsonObject.getLong("department_id");
+            }
             return new RequestEmplDepart(
-                    jsonObject.getLong("employee_id"),
-                    jsonObject.getLong("department_id")
+                    employeeId,
+                    departmentId
             );
         } catch (JSONException exception) {
             var error = new CannotParseFromJsonError(json, exception.getMessage());
@@ -118,8 +126,9 @@ public class Parse {
         try {
             JSONObject jsonObject = new JSONObject(json);
             return new RequestUpdatePhoneNumber(
-                    jsonObject.getString("phone_number"),
-                    jsonObject.getLong("employee_id")
+                    jsonObject.getLong("id"),
+                    jsonObject.getLong("employee_id"),
+                    jsonObject.getString("phone_number")
             );
         } catch (JSONException exception) {
             var error = new CannotParseFromJsonError(json, exception.getMessage());

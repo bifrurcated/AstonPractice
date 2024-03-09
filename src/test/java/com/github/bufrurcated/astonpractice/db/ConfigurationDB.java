@@ -5,17 +5,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-
-
+@Getter
 @Slf4j
-public class DatabaseSource {
+public class ConfigurationDB {
 
-    @Getter private static final SessionFactory sessionFactory = buildSessionFactory();
+    private final SessionFactory sessionFactory = buildSessionFactory();
 
-    private static SessionFactory buildSessionFactory() {
+    private SessionFactory buildSessionFactory() {
         try {
             return new Configuration().configure("hibernate.cfg.xml").buildSessionFactory();
         } catch (Throwable ex) {
@@ -24,7 +20,7 @@ public class DatabaseSource {
         }
     }
 
-    public static void shutdown() {
+    public void shutdown() {
         sessionFactory.close();
         log.info("Close connection");
     }

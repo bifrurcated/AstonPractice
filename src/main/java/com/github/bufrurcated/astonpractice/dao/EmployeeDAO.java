@@ -2,6 +2,10 @@ package com.github.bufrurcated.astonpractice.dao;
 
 import com.github.bufrurcated.astonpractice.entity.Employee;
 import com.github.bufrurcated.astonpractice.errors.NotFoundSQLException;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.internal.TransactionManagement;
+import org.hibernate.query.NativeQuery;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -9,107 +13,111 @@ import java.util.List;
 
 public class EmployeeDAO extends AbstractDao implements Dao<Employee, Long> {
 
-    public EmployeeDAO(Connection connection) {
-        super(connection);
+    public EmployeeDAO(SessionFactory sessionFactory) {
+        super(sessionFactory);
     }
 
     @Override
     public void save(Employee employee) throws SQLException {
-        String sql = "INSERT INTO employee (first_name, last_name, age) VALUES (?, ?, ?)";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, employee.getFirstName());
-            preparedStatement.setString(2, employee.getLastName());
-            preparedStatement.setInt(3, employee.getAge());
-            preparedStatement.executeUpdate();
+        Transaction tx = null;
+        try (var session = openSession()) {
+            tx = session.beginTransaction();
+            session.persist(employee);
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            throw e;
         }
     }
 
     @Override
     public List<Employee> findAll() throws SQLException {
-        try (Statement statement = connection.createStatement()) {
-            String sql = "SELECT id, first_name, last_name, age FROM employee";
-            ResultSet resultSet = statement.executeQuery(sql);
-            if (!resultSet.isBeforeFirst()) {
+        try (var session = openSession()) {
+            var sql = "SELECT id, first_name, last_name, age FROM employees";
+            var query = session.createNativeQuery(sql, Employee.class);
+            var results = query.list();
+            if (results.isEmpty()) {
                 throw new NotFoundSQLException();
             }
-            List<Employee> employeeList = new ArrayList<>();
-            while (resultSet.next()) {
-                Employee employee = new Employee();
-                employee.setId(resultSet.getLong(1));
-                employee.setFirstName(resultSet.getString(2));
-                employee.setLastName(resultSet.getString(3));
-                employee.setAge(resultSet.getInt(4));
-                employeeList.add(employee);
-            }
-            return employeeList;
+            return results;
         }
     }
 
     @Override
     public List<Employee> find(Long id) throws SQLException {
-        String sql = "SELECT id, first_name, last_name, age FROM employee where id = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setLong(1, id);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (!resultSet.next()) {
+        try (var session = openSession()) {
+            var result = session.get(Employee.class, id);
+            if (result == null) {
                 throw new NotFoundSQLException();
             }
-            Employee employee = new Employee();
-            employee.setId(resultSet.getLong(1));
-            employee.setFirstName(resultSet.getString(2));
-            employee.setLastName(resultSet.getString(3));
-            employee.setAge(resultSet.getInt(4));
-            return List.of(employee);
+            return List.of(result);
         }
     }
 
     @Override
     public void update(Employee employee) throws SQLException {
-        String sql = "UPDATE employee SET first_name = ?, last_name = ?, age = ? WHERE id = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, employee.getFirstName());
-            preparedStatement.setString(2, employee.getLastName());
-            preparedStatement.setInt(3, employee.getAge());
-            preparedStatement.setLong(4, employee.getId());
-            preparedStatement.executeUpdate();
+        Transaction tx = null;
+        try (var session = openSession()) {
+            tx = session.beginTransaction();
+            session.merge(employee);
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            throw e;
         }
     }
 
     @Override
     public void delete(Long id) throws SQLException {
-        String sql1 = "DELETE FROM employee_department WHERE employee_id = ?";
-        String sql2 = "DELETE FROM phone_numbers WHERE employee_id = ?";
-        String sql3 = "DELETE FROM employee WHERE id = ?";
-        try (PreparedStatement preparedStatement1 = connection.prepareStatement(sql1);
-             PreparedStatement preparedStatement2 = connection.prepareStatement(sql2);
-             PreparedStatement preparedStatement3 = connection.prepareStatement(sql3)) {
-            connection.setAutoCommit(false);
-            preparedStatement1.setLong(1, id);
-            preparedStatement2.setLong(1, id);
-            preparedStatement3.setLong(1, id);
-            preparedStatement1.execute();
-            preparedStatement2.execute();
-            int rowsDeleted = preparedStatement3.executeUpdate();
-            if (rowsDeleted == 0) {
-                connection.rollback();
-                throw new NotFoundSQLException();
+        try (var session = openSession()) {
+            Transaction tx = null;
+            try {
+                tx = session.beginTransaction();
+                var sql1 = "DELETE FROM employee_department WHERE employee_id = ?";
+                var sql2 = "DELETE FROM phone_numbers WHERE employee_id = ?";
+                var sql3 = "DELETE FROM employees WHERE id = ?";
+                var query1 = session.createNativeQuery(sql1, Void.class).setParameter(1, id);
+                var query2 = session.createNativeQuery(sql2, Void.class).setParameter(1, id);
+                var query3 = session.createNativeQuery(sql3, Void.class).setParameter(1, id);
+                query1.executeUpdate();
+                query2.executeUpdate();
+                var rowsDeleted = query3.executeUpdate();
+                if (rowsDeleted == 0) {
+                    tx.rollback();
+                    throw new NotFoundSQLException();
+                }
+                tx.commit();
+            } catch (SQLException exception) {
+                tx.rollback();
+                throw new SQLException(exception);
             }
-            connection.commit();
-        } catch (SQLException e) {
-            connection.rollback();
-            throw new SQLException(e);
         }
     }
 
     @Override
     public void deleteAll() throws SQLException {
-        try (Statement statement = connection.createStatement()) {
-            String sql1 = "DELETE FROM employee_department";
-            String sql2 = "DELETE FROM phone_numbers";
-            String sql3 = "DELETE FROM employee";
-            statement.execute(sql1);
-            statement.execute(sql2);
-            statement.execute(sql3);
+        try (var session = openSession()) {
+            Transaction tx = null;
+            try {
+                tx = session.beginTransaction();
+                var sql1 = "DELETE FROM employee_department";
+                var sql2 = "DELETE FROM phone_numbers";
+                var sql3 = "DELETE FROM employees";
+                var query1 = session.createNativeQuery(sql1, Void.class);
+                var query2 = session.createNativeQuery(sql2, Void.class);
+                var query3 = session.createNativeQuery(sql3, Void.class);
+                query1.executeUpdate();
+                query2.executeUpdate();
+                var rowsDeleted = query3.executeUpdate();
+                if (rowsDeleted == 0) {
+                    tx.rollback();
+                    throw new NotFoundSQLException();
+                }
+                tx.commit();
+            } catch (Exception e) {
+                if (tx != null) tx.rollback();
+                throw e;
+            }
         }
     }
 }

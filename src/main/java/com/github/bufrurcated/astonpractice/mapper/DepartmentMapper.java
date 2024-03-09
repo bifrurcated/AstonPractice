@@ -9,7 +9,7 @@ public class DepartmentMapper {
 
 
     public ResponseDepartment map(Department department) {
-        return new ResponseDepartment(department.getName());
+        return new ResponseDepartment(department.getId(), department.getName());
     }
 
     public Department map(RequestCreateDepartment requestCreateDepartment) {

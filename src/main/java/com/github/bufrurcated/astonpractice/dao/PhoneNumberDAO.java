@@ -1,66 +1,68 @@
 package com.github.bufrurcated.astonpractice.dao;
 
 import com.github.bufrurcated.astonpractice.dto.FindNumber;
+import com.github.bufrurcated.astonpractice.entity.Employee;
 import com.github.bufrurcated.astonpractice.entity.PhoneNumber;
+import com.github.bufrurcated.astonpractice.errors.EmployeeNotFoundSQLException;
 import com.github.bufrurcated.astonpractice.errors.NotFoundSQLException;
+import jdk.jshell.spi.ExecutionControlProvider;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.cache.internal.EnabledCaching;
+import org.hibernate.query.NativeQuery;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 public class PhoneNumberDAO extends AbstractDao implements Dao<PhoneNumber, FindNumber> {
-    public PhoneNumberDAO(Connection connection) {
-        super(connection);
+    public PhoneNumberDAO(SessionFactory sessionFactory) {
+        super(sessionFactory);
     }
 
     @Override
     public void save(PhoneNumber phoneNumber) throws SQLException {
-        String sql = "INSERT INTO phone_numbers (phone_number, employee_id) VALUES (?, ?)";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, phoneNumber.getPhoneNumber());
-            preparedStatement.setLong(2, phoneNumber.getEmployeeId());
-            preparedStatement.executeUpdate();
+        Transaction tx = null;
+        try (var session = openSession()) {
+            tx = session.beginTransaction();
+            var employee = session.get(Employee.class, phoneNumber.getEmployee().getId());
+            if (employee == null) {
+                tx.rollback();
+                throw new EmployeeNotFoundSQLException();
+            }
+            phoneNumber.setEmployee(employee);
+            session.persist(phoneNumber);
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            throw e;
         }
     }
 
     @Override
     public List<PhoneNumber> findAll() throws SQLException {
-        try (Statement statement = connection.createStatement()) {
+        try (var session = openSession()) {
             String sql = "SELECT id, phone_number, employee_id FROM phone_numbers";
-            ResultSet resultSet = statement.executeQuery(sql);
-            if (!resultSet.isBeforeFirst()) {
+            var query = session.createNativeQuery(sql, PhoneNumber.class);
+            var results = query.list();
+            if (results.isEmpty()) {
                 throw new NotFoundSQLException();
             }
-            List<PhoneNumber> phoneNumbers = new ArrayList<>();
-            while (resultSet.next()) {
-                PhoneNumber phoneNumber = new PhoneNumber();
-                phoneNumber.setId(resultSet.getLong(1));
-                phoneNumber.setPhoneNumber(resultSet.getString(2));
-                phoneNumber.setEmployeeId(resultSet.getLong(3));
-                phoneNumbers.add(phoneNumber);
-            }
-            return phoneNumbers;
+            return results;
         }
     }
 
     @Override
     public List<PhoneNumber> find(FindNumber find) throws SQLException {
-        Result result = getResult(find, "SELECT id, phone_number, employee_id FROM phone_numbers WHERE");
-        try (PreparedStatement preparedStatement = connection.prepareStatement(result.sql().toString())) {
-            preparedStatement.setLong(1, result.id());
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (!resultSet.isBeforeFirst()) {
+        try (var session = openSession()) {
+            Result result = getResult(find, "SELECT id, phone_number, employee_id FROM phone_numbers WHERE");
+            var query = session.createNativeQuery(result.sql(), PhoneNumber.class);
+            var results = query.setParameter(1, result.id()).list();
+            if (results.isEmpty()) {
                 throw new NotFoundSQLException();
             }
-            List<PhoneNumber> emplDeparts = new ArrayList<>();
-            while (resultSet.next()) {
-                PhoneNumber phoneNumber = new PhoneNumber();
-                phoneNumber.setId(resultSet.getLong(1));
-                phoneNumber.setPhoneNumber(resultSet.getString(2));
-                phoneNumber.setEmployeeId(resultSet.getLong(3));
-                emplDeparts.add(phoneNumber);
-            }
-            return emplDeparts;
+            return results;
         }
     }
 
@@ -74,41 +76,61 @@ public class PhoneNumberDAO extends AbstractDao implements Dao<PhoneNumber, Find
             sql.append(" employee_id = ?");
             id = find.employeeId();
         }
-        return new Result(sql, id);
+        return new Result(sql.toString(), id);
     }
 
-    private record Result(StringBuilder sql, Long id) {
+    private record Result(String sql, Long id) {
     }
 
     @Override
     public void update(PhoneNumber phoneNumber) throws SQLException {
-        String sql = "UPDATE phone_numbers SET phone_number = ?, employee_id = ? WHERE id = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, phoneNumber.getPhoneNumber());
-            preparedStatement.setLong(2, phoneNumber.getEmployeeId());
-            preparedStatement.setLong(3, phoneNumber.getId());
-            preparedStatement.executeUpdate();
+        Transaction tx = null;
+        try (var session = openSession()) {
+            tx = session.beginTransaction();
+            session.merge(phoneNumber);
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            throw e;
         }
     }
 
     @Override
     public void delete(FindNumber find) throws SQLException {
-        String query = "DELETE FROM phone_numbers WHERE";
-        Result result = getResult(find, query);
-        try (PreparedStatement preparedStatement = connection.prepareStatement(result.sql().toString())) {
-            preparedStatement.setLong(1, result.id());
-            int rowsDeleted = preparedStatement.executeUpdate();
+        Transaction tx = null;
+        try (var session = openSession()) {
+            tx = session.beginTransaction();
+            String sql = "DELETE FROM phone_numbers WHERE";
+            Result result = getResult(find, sql);
+            var query = session.createNativeQuery(result.sql(), Void.class);
+            var rowsDeleted = query.setParameter(1, result.id()).executeUpdate();
             if (rowsDeleted == 0) {
+                tx.rollback();
                 throw new NotFoundSQLException();
             }
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            throw e;
         }
     }
 
     @Override
     public void deleteAll() throws SQLException {
-        try (Statement statement = connection.createStatement()) {
+        Transaction tx = null;
+        try (var session = openSession()) {
+            tx = session.beginTransaction();
             String sql = "DELETE FROM phone_numbers";
-            statement.execute(sql);
+            var query = session.createNativeQuery(sql, Void.class);
+            var rowsDeleted = query.executeUpdate();
+            if (rowsDeleted == 0) {
+                tx.rollback();
+                throw new NotFoundSQLException();
+            }
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            throw e;
         }
     }
 }

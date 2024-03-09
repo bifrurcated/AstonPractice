@@ -2,105 +2,111 @@ package com.github.bufrurcated.astonpractice.dao;
 
 import com.github.bufrurcated.astonpractice.entity.Department;
 import com.github.bufrurcated.astonpractice.errors.NotFoundSQLException;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 
 import java.sql.*;
-import java.util.ArrayList;
 import java.util.List;
 
 public class DepartmentDAO extends AbstractDao implements Dao<Department, Long> {
 
-    public DepartmentDAO(Connection connection) {
-        super(connection);
+    public DepartmentDAO(SessionFactory sessionFactory) {
+        super(sessionFactory);
     }
 
     @Override
     public void save(Department department) throws SQLException {
-        String sql = "INSERT INTO department (dpt_name) VALUES (?)";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setString(1, department.getName());
-            preparedStatement.executeUpdate();
+        Transaction tx = null;
+        try (var session = openSession()) {
+            tx = session.beginTransaction();
+            session.persist(department);
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            throw e;
         }
     }
 
     @Override
     public List<Department> findAll() throws SQLException {
-        try (Statement statement = connection.createStatement()) {
-            String sql = "SELECT id, dpt_name FROM department";
-            ResultSet resultSet = statement.executeQuery(sql);
-            if (!resultSet.isBeforeFirst()) {
+        try (var session = openSession()) {
+            var sql = "SELECT id, dpt_name FROM departments";
+            var query = session.createNativeQuery(sql, Department.class);
+            var list = query.list();
+            if (list.isEmpty()) {
                 throw new NotFoundSQLException();
             }
-            List<Department> departmentList = new ArrayList<>();
-            while (resultSet.next()) {
-                Department department = new Department();
-                department.setId(resultSet.getLong(1));
-                department.setName(resultSet.getString(2));
-                departmentList.add(department);
-            }
-            return departmentList;
+            return list;
         }
     }
 
     @Override
     public List<Department> find(Long id) throws SQLException {
-        String sql = "SELECT id, dpt_name FROM department where id = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.setLong(1, id);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            if (!resultSet.next()) {
+        try (var session = openSession()) {
+            var department = session.get(Department.class, id);
+            if (department == null) {
                 throw new NotFoundSQLException();
             }
-            Department employee = new Department();
-            employee.setId(resultSet.getLong(1));
-            employee.setName(resultSet.getString(2));
-            return List.of(employee);
+            return List.of(department);
         }
     }
 
     @Override
     public void update(Department department) throws SQLException {
-        String sql = "UPDATE department SET dpt_name = ? WHERE id = ?";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            connection.setAutoCommit(false);
-            preparedStatement.setString(1, department.getName());
-            preparedStatement.setLong(2, department.getId());
-            preparedStatement.executeUpdate();
-            connection.commit();
-        } catch (SQLException e) {
-            connection.rollback();
-            throw new SQLException(e);
+        Transaction tx = null;
+        try (var session = openSession()) {
+            tx = session.beginTransaction();
+            session.merge(department);
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            throw e;
         }
     }
 
     @Override
     public void delete(Long id) throws SQLException {
-        String sql1 = "DELETE FROM employee_department WHERE department_id = ?";
-        String sql2 = "DELETE FROM department WHERE id = ?";
-        try (PreparedStatement preparedStatement1 = connection.prepareStatement(sql1);
-             PreparedStatement preparedStatement2 = connection.prepareStatement(sql2)) {
-            connection.setAutoCommit(false);
-            preparedStatement1.setLong(1, id);
-            preparedStatement2.setLong(1, id);
-            preparedStatement1.execute();
-            int rowsDeleted = preparedStatement2.executeUpdate();
-            if (rowsDeleted == 0) {
-                connection.rollback();
-                throw new NotFoundSQLException();
+        try (var session = openSession()) {
+            Transaction tx = null;
+            try {
+                tx = session.beginTransaction();
+                var sql1 = "DELETE FROM employee_department WHERE department_id = ?";
+                var sql2 = "DELETE FROM departments WHERE id = ?";
+                var query1 = session.createNativeQuery(sql1, Void.class).setParameter(1, id);
+                var query2 = session.createNativeQuery(sql2, Void.class).setParameter(1, id);
+                query1.executeUpdate();
+                var rowsDeleted = query2.executeUpdate();
+                if (rowsDeleted == 0) {
+                    tx.rollback();
+                    throw new NotFoundSQLException();
+                }
+                tx.commit();
+            } catch (SQLException exception) {
+                tx.rollback();
+                throw new SQLException(exception);
             }
-            connection.commit();
-        } catch (SQLException e) {
-            connection.rollback();
-            throw new SQLException(e);
         }
     }
 
     @Override
     public void deleteAll() throws SQLException {
-        try (Statement statement = connection.createStatement()) {
-            String sql1 = "DELETE FROM employee_department WHERE department_id IN (SELECT id FROM department)";
-            String sql2 = "DELETE FROM department";
-            statement.execute(sql1);
-            statement.execute(sql2);
+        Transaction tx = null;
+        try (var session = openSession()) {
+            tx = session.beginTransaction();
+            var sql1 = "DELETE FROM employee_department";
+            var sql2 = "DELETE FROM departments";
+            var query1 = session.createNativeQuery(sql1, Void.class);
+            var query2 = session.createNativeQuery(sql2, Void.class);
+            query1.executeUpdate();
+            var rowsDeleted = query2.executeUpdate();
+            if (rowsDeleted == 0) {
+                tx.rollback();
+                throw new NotFoundSQLException();
+            }
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            throw e;
         }
     }
 }

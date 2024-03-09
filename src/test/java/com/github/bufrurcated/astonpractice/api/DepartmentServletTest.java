@@ -1,18 +1,24 @@
 package com.github.bufrurcated.astonpractice.api;
 
-import com.github.bufrurcated.astonpractice.dao.EmployeeDAO;
-import com.github.bufrurcated.astonpractice.dto.ResponseEmployee;
-import com.github.bufrurcated.astonpractice.entity.Employee;
+import com.github.bufrurcated.astonpractice.dao.DepartmentDAO;
 import com.github.bufrurcated.astonpractice.db.ConfigurationDB;
-import com.github.bufrurcated.astonpractice.service.EmployeeService;
+import com.github.bufrurcated.astonpractice.dto.ResponseDepartment;
+import com.github.bufrurcated.astonpractice.entity.Department;
+import com.github.bufrurcated.astonpractice.service.DepartmentService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.SneakyThrows;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.PrintWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,15 +26,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-class EmployeeServletTest {
-    private static EmployeeServlet servlet;
+class DepartmentServletTest {
+    private static DepartmentServlet servlet;
     private StringWriter writer;
     private ConfigurationDB configurationDB;
 
     @BeforeAll
     @SneakyThrows
     static void init() {
-        servlet = new EmployeeServlet();
+        servlet = new DepartmentServlet();
         servlet.init();
     }
 
@@ -36,10 +42,9 @@ class EmployeeServletTest {
     @SneakyThrows
     public void setUp() {
         configurationDB = new ConfigurationDB();
-        var employeeService = new EmployeeService(new EmployeeDAO(configurationDB.getSessionFactory()));
-        employeeService.add(Employee.builder().firstName("Nick").lastName("Jordan").age(19).build());
-        employeeService.add(Employee.builder().firstName("Jonh").lastName("Mike").age(35).build());
-        employeeService.add(Employee.builder().firstName("Artyom").lastName("Vedoseev").age(25).build());
+        var departmentService = new DepartmentService(new DepartmentDAO(configurationDB.getSessionFactory()));
+        departmentService.add(Department.builder().name("Back-end").build());
+        departmentService.add(Department.builder().name("Front-end").build());
         writer = new StringWriter();
     }
 
@@ -51,7 +56,7 @@ class EmployeeServletTest {
 
     @SneakyThrows
     @Test
-    void testGetOneEmployee() {
+    void testGetOneDepartment() {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
@@ -59,15 +64,15 @@ class EmployeeServletTest {
         when(response.getWriter()).thenReturn(new PrintWriter(writer));
 
         servlet.doGet(request, response);
-        var responseEmployee = new ResponseEmployee(1L, "Nick", "Jordan", 19);
-        String expected = new JSONObject(responseEmployee).toString();
+        var responseDepartment = new ResponseDepartment(1L, "Back-end");
+        String expected = new JSONObject(responseDepartment).toString();
 
         assertEquals(expected, writer.toString());
     }
 
     @SneakyThrows
     @Test
-    void testGetAllEmployee() {
+    void testGetAllDepartments() {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
 
@@ -75,25 +80,22 @@ class EmployeeServletTest {
         when(response.getWriter()).thenReturn(new PrintWriter(writer));
 
         servlet.doGet(request, response);
-        List<ResponseEmployee> employeeList = new ArrayList<>();
-        employeeList.add(new ResponseEmployee(1L, "Nick", "Jordan", 19));
-        employeeList.add(new ResponseEmployee(2L, "Jonh", "Mike", 35));
-        employeeList.add(new ResponseEmployee(3L, "Artyom", "Vedoseev", 25));
-        String expected = new JSONArray(employeeList).toString();
+        List<ResponseDepartment> responseDepartments = new ArrayList<>();
+        responseDepartments.add(new ResponseDepartment(1L, "Back-end"));
+        responseDepartments.add(new ResponseDepartment(2L, "Front-end"));
+        String expected = new JSONArray(responseDepartments).toString();
 
         assertEquals(expected, writer.toString());
     }
 
     @SneakyThrows
     @Test
-    void testPostCreateEmployee() {
+    void testPostCreateDepartment() {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         String json = """
                 {
-                    "first_name": "Pol",
-                    "last_name": "Anderson",
-                    "age": 21
+                    "name": "Testers"
                 }
                 """;
         when(request.getReader()).thenReturn(new BufferedReader(new StringReader(json)));
@@ -101,20 +103,18 @@ class EmployeeServletTest {
 
         servlet.doPost(request, response);
 
-        assertEquals("Employee created", writer.toString());
+        assertEquals("Department created", writer.toString());
     }
 
     @SneakyThrows
     @Test
-    void testPUTUpdateEmployee() {
+    void testPUTUpdateDepartment() {
         HttpServletRequest request = mock(HttpServletRequest.class);
         HttpServletResponse response = mock(HttpServletResponse.class);
         String json = """
                 {
                     "id": 1,
-                    "first_name": "Pol",
-                    "last_name": "Anderson",
-                    "age": 21
+                    "name": "Java Back-end",
                 }
                 """;
         when(request.getReader()).thenReturn(new BufferedReader(new StringReader(json)));
@@ -122,7 +122,7 @@ class EmployeeServletTest {
 
         servlet.doPut(request, response);
 
-        assertEquals("Employee update", writer.toString());
+        assertEquals("Department update", writer.toString());
     }
 
     @SneakyThrows
@@ -136,7 +136,7 @@ class EmployeeServletTest {
 
         servlet.doDelete(request, response);
 
-        assertEquals("Employee deleted", writer.toString());
+        assertEquals("Department deleted", writer.toString());
     }
 
     @SneakyThrows
@@ -150,6 +150,6 @@ class EmployeeServletTest {
 
         servlet.doDelete(request, response);
 
-        assertEquals("All employees deleted", writer.toString());
+        assertEquals("All departments deleted", writer.toString());
     }
 }

@@ -4,6 +4,7 @@ import com.github.bufrurcated.astonpractice.dao.Dao;
 import com.github.bufrurcated.astonpractice.dao.EmployeeDAO;
 import com.github.bufrurcated.astonpractice.entity.Employee;
 import com.github.bufrurcated.astonpractice.errors.*;
+import jakarta.transaction.Transactional;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -16,6 +17,7 @@ public class EmployeeService {
         this.dao = dao;
     }
 
+    @Transactional
     public void add(Employee employee) throws ResponseStatusException {
         try {
             dao.save(employee);
@@ -65,6 +67,8 @@ public class EmployeeService {
     public void removeAll() throws ResponseStatusException {
         try {
             dao.deleteAll();
+        } catch (NotFoundSQLException e) {
+            throw new EmployeeNotFoundError();
         } catch (SQLException e) {
             throw new SQLError(e.getMessage());
         }

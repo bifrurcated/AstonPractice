@@ -1,4 +1,8 @@
 package com.github.bufrurcated.astonpractice.dto;
 
-public record RequestUpdatePhoneNumber(String phoneNumber, Long employeeId) {
+public record RequestUpdatePhoneNumber(
+        Long id,
+        Long employeeId,
+        String phoneNumber
+) {
 }

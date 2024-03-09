@@ -25,6 +25,7 @@ public class EmployeeMapper {
 
     public ResponseEmployee map(Employee employee) {
         return new ResponseEmployee(
+                employee.getId(),
                 employee.getFirstName(),
                 employee.getLastName(),
                 employee.getAge()

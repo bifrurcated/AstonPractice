@@ -23,14 +23,12 @@ import java.util.Optional;
 @WebServlet(urlPatterns = {"/api/v1/department/*"})
 public class DepartmentServlet extends HttpServlet {
     private DepartmentService service;
-    private DatabaseSource databaseSource;
     private final DepartmentMapper departmentMapper = new DepartmentMapper();
 
     @Override
     public void init() throws ServletException {
-        databaseSource = new DatabaseSource();
-        var connection = databaseSource.getConnection();
-        var dao = new DepartmentDAO(connection);
+        var sessionFactory = DatabaseSource.getSessionFactory();
+        var dao = new DepartmentDAO(sessionFactory);
         service = new DepartmentService(dao);
     }
 
@@ -52,17 +50,16 @@ public class DepartmentServlet extends HttpServlet {
             resp.setContentType("application/json");
             resp.getWriter().write(new JSONObject(responseDepartment).toString());
         } else {
-            List<Department> employees;
+            List<ResponseDepartment> responseDepartments;
             try {
-                employees = service.getAll();
+                responseDepartments = service.getAll().stream().map(departmentMapper::map).toList();
             } catch (ResponseStatusException exception) {
                 resp.sendError(exception.getStatus(), exception.getReason());
                 throw new RuntimeException(exception.getMessage());
             }
-            var employeeList = employees.stream().map(departmentMapper::map).toList();
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.setContentType("application/json");
-            resp.getWriter().write(new JSONArray(employeeList).toString());
+            resp.getWriter().write(new JSONArray(responseDepartments).toString());
         }
     }
 
@@ -120,10 +117,5 @@ public class DepartmentServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.getWriter().write("All departments deleted");
         }
-    }
-
-    @Override
-    public void destroy() {
-        databaseSource.shutdown();
     }
 }

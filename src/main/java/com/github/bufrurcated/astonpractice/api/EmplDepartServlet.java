@@ -25,14 +25,12 @@ import java.util.Optional;
 @WebServlet(urlPatterns = {"/api/v1/employee-department"})
 public class EmplDepartServlet extends HttpServlet {
     private EmplDepartService service;
-    private DatabaseSource databaseSource;
     private final EmplDepartMapper emplDepartMapper = new EmplDepartMapper();
 
     @Override
     public void init() throws ServletException {
-        databaseSource = new DatabaseSource();
-        var connection = databaseSource.getConnection();
-        var dao = new EmplDepartDAO(connection);
+        var sessionFactory = DatabaseSource.getSessionFactory();
+        var dao = new EmplDepartDAO(sessionFactory);
         service = new EmplDepartService(dao);
     }
 
@@ -42,29 +40,27 @@ public class EmplDepartServlet extends HttpServlet {
         if (body != null && !body.isEmpty()) {
             var requestEmplDepart = Parse.jsonToEmplDepart(resp, body);
             var emplDepart = emplDepartMapper.map(requestEmplDepart);
-            List<EmplDepart> emplDeparts;
+            List<ResponseEmplDepart> responseEmplDeparts;
             try {
-                emplDeparts = service.get(emplDepart);
+                responseEmplDeparts = service.get(emplDepart).stream().map(emplDepartMapper::map).toList();
             } catch (ResponseStatusException exception) {
                 resp.sendError(exception.getStatus(), exception.getReason());
                 throw new RuntimeException(exception.getMessage());
             }
-            var emplDepartList = emplDeparts.stream().map(emplDepartMapper::map).toList();
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.setContentType("application/json");
-            resp.getWriter().write(new JSONArray(emplDepartList).toString());
+            resp.getWriter().write(new JSONArray(responseEmplDeparts).toString());
         } else {
-            List<EmplDepart> emplDeparts;
+            List<ResponseEmplDepart> responseEmplDeparts;
             try {
-                emplDeparts = service.getAll();
+                responseEmplDeparts = service.getAll().stream().map(emplDepartMapper::map).toList();
             } catch (ResponseStatusException exception) {
                 resp.sendError(exception.getStatus(), exception.getReason());
                 throw new RuntimeException(exception.getMessage());
             }
-            var emplDepartList = emplDeparts.stream().map(emplDepartMapper::map).toList();
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.setContentType("application/json");
-            resp.getWriter().write(new JSONArray(emplDepartList).toString());
+            resp.getWriter().write(new JSONArray(responseEmplDeparts).toString());
         }
     }
 
@@ -107,10 +103,5 @@ public class EmplDepartServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.getWriter().write("All Employee Department deleted");
         }
-    }
-
-    @Override
-    public void destroy() {
-        databaseSource.shutdown();
     }
 }

@@ -2,6 +2,7 @@ package com.github.bufrurcated.astonpractice.api;
 
 import com.github.bufrurcated.astonpractice.dao.EmployeeDAO;
 import com.github.bufrurcated.astonpractice.db.DatabaseSource;
+import com.github.bufrurcated.astonpractice.dto.ResponseEmployee;
 import com.github.bufrurcated.astonpractice.entity.Employee;
 import com.github.bufrurcated.astonpractice.errors.ResponseStatusException;
 import com.github.bufrurcated.astonpractice.mapper.EmployeeMapper;
@@ -22,14 +23,12 @@ import java.util.Optional;
 @WebServlet(urlPatterns = {"/api/v1/employees/*"})
 public class EmployeeServlet extends HttpServlet {
     private EmployeeService service;
-    private DatabaseSource databaseSource;
     private final EmployeeMapper employeeMapper = new EmployeeMapper();
 
     @Override
     public void init() throws ServletException {
-        databaseSource = new DatabaseSource();
-        var connection = databaseSource.getConnection();
-        var dao = new EmployeeDAO(connection);
+        var sessionFactory = DatabaseSource.getSessionFactory();
+        var dao = new EmployeeDAO(sessionFactory);
         service = new EmployeeService(dao);
     }
 
@@ -51,16 +50,16 @@ public class EmployeeServlet extends HttpServlet {
             resp.setContentType("application/json");
             resp.getWriter().write(new JSONObject(responseEmployee).toString());
         } else {
-            List<Employee> employees;
+            List<ResponseEmployee> responseEmployees;
             try {
-                employees = service.getAll();
+                responseEmployees = service.getAll().stream().map(employeeMapper::map).toList();
             } catch (ResponseStatusException exception) {
                 resp.sendError(exception.getStatus(), exception.getReason());
                 throw new RuntimeException(exception.getMessage());
             }
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.setContentType("application/json");
-            resp.getWriter().write(new JSONArray(employees).toString());
+            resp.getWriter().write(new JSONArray(responseEmployees).toString());
         }
     }
 
@@ -118,10 +117,5 @@ public class EmployeeServlet extends HttpServlet {
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.getWriter().write("All employees deleted");
         }
-    }
-
-    @Override
-    public void destroy() {
-        databaseSource.shutdown();
     }
 }

@@ -3,10 +3,7 @@ package com.github.bufrurcated.astonpractice.service;
 import com.github.bufrurcated.astonpractice.dao.Dao;
 import com.github.bufrurcated.astonpractice.dto.FindNumber;
 import com.github.bufrurcated.astonpractice.entity.PhoneNumber;
-import com.github.bufrurcated.astonpractice.errors.NotFoundSQLException;
-import com.github.bufrurcated.astonpractice.errors.PhoneNumberNotFoundError;
-import com.github.bufrurcated.astonpractice.errors.ResponseStatusException;
-import com.github.bufrurcated.astonpractice.errors.SQLError;
+import com.github.bufrurcated.astonpractice.errors.*;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -22,6 +19,8 @@ public class PhoneNumberService {
     public void add(PhoneNumber phoneNumber) throws ResponseStatusException {
         try {
             dao.save(phoneNumber);
+        } catch (EmployeeNotFoundSQLException e) {
+            throw new EmployeeNotFoundError();
         } catch (SQLException e) {
             throw new SQLError(e.getMessage());
         }
