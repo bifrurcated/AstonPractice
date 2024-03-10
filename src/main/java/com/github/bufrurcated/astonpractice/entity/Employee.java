@@ -4,21 +4,17 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.proxy.HibernateProxy;
 
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Setter
 @ToString
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 @Table(name = "employees")
-public class Employee {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+@Inheritance(strategy = InheritanceType.JOINED)
+public class Employee extends AbstractEntity {
+
     @Column(name = "first_name", nullable = false)
     private String firstName;
     @Column(name = "last_name", nullable = false)
@@ -27,7 +23,7 @@ public class Employee {
     private int age;
     @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @ToString.Exclude
-    private Set<PhoneNumber> phoneNumbers;
+    private List<PhoneNumber> phoneNumbers = new ArrayList<>();
     @ManyToMany(
             cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
             fetch = FetchType.LAZY
@@ -38,14 +34,20 @@ public class Employee {
             inverseJoinColumns = @JoinColumn(name = "department_id", referencedColumnName = "id")
     )
     @ToString.Exclude
-    private Set<Department> departments = new HashSet<>();
+    private List<Department> departments = new ArrayList<>();
 
     @Builder
     public Employee(Long id, String firstName, String lastName, int age) {
-        this.id = id;
+        this(id, firstName, lastName, age, new ArrayList<>(), new ArrayList<>());
+    }
+
+    public Employee(Long id, String firstName, String lastName, int age, List<PhoneNumber> phoneNumbers, List<Department> departments) {
+        super(id);
         this.firstName = firstName;
         this.lastName = lastName;
         this.age = age;
+        this.phoneNumbers = phoneNumbers;
+        this.departments = departments;
     }
 
     @Override
@@ -57,10 +59,5 @@ public class Employee {
         if (thisEffectiveClass != oEffectiveClass) return false;
         Employee employee = (Employee) o;
         return getId() != null && Objects.equals(getId(), employee.getId());
-    }
-
-    @Override
-    public final int hashCode() {
-        return this instanceof HibernateProxy h ? h.getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
 }

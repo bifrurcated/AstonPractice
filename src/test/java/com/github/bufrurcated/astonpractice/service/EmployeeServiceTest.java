@@ -2,14 +2,16 @@ package com.github.bufrurcated.astonpractice.service;
 
 import com.github.bufrurcated.astonpractice.dao.EmployeeDAO;
 import com.github.bufrurcated.astonpractice.db.ConfigurationDB;
-import com.github.bufrurcated.astonpractice.db.DatabaseSource;
 import com.github.bufrurcated.astonpractice.entity.Department;
 import com.github.bufrurcated.astonpractice.entity.Employee;
 import com.github.bufrurcated.astonpractice.entity.PhoneNumber;
 import lombok.SneakyThrows;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
-import java.util.Set;
+import java.util.List;
 
 public class EmployeeServiceTest {
     private EmployeeService employeeService;
@@ -39,7 +41,7 @@ public class EmployeeServiceTest {
         phoneNumber.setEmployee(employee);
         var department = new Department();
         department.setName("Programmer");
-        employee.setDepartments(Set.of(department));
+        employee.setDepartments(List.of(department));
         employeeService.add(employee);
 
         var result = employeeService.getById(1L);
@@ -48,8 +50,8 @@ public class EmployeeServiceTest {
                 "Nick",
                 "Malkovich",
                 21,
-                Set.of(phoneNumber),
-                Set.of(new Department(1L, "Programmer")));
+                List.of(phoneNumber),
+                List.of(new Department(1L, "Programmer")));
         Assertions.assertEquals(expected, result);
     }
 }

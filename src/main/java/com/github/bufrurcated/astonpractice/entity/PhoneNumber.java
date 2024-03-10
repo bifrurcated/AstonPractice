@@ -12,10 +12,8 @@ import java.util.Objects;
 @NoArgsConstructor
 @Entity
 @Table(name = "phone_numbers")
-public class PhoneNumber {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+public class PhoneNumber extends AbstractEntity {
+
     @Column(name = "phone_number", nullable = false)
     private String phoneNumber;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -29,24 +27,19 @@ public class PhoneNumber {
 
     @Builder
     public PhoneNumber(Long id, String phoneNumber, Employee employee) {
-        this.id = id;
+        super(id);
         this.phoneNumber = phoneNumber;
         this.employee = employee;
     }
 
     @Override
-    public final boolean equals(Object o) {
+    public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null) return false;
         Class<?> oEffectiveClass = o instanceof HibernateProxy h ? h.getHibernateLazyInitializer().getPersistentClass() : o.getClass();
         Class<?> thisEffectiveClass = this instanceof HibernateProxy h ? h.getHibernateLazyInitializer().getPersistentClass() : this.getClass();
         if (thisEffectiveClass != oEffectiveClass) return false;
-        PhoneNumber that = (PhoneNumber) o;
-        return getId() != null && Objects.equals(getId(), that.getId());
-    }
-
-    @Override
-    public final int hashCode() {
-        return this instanceof HibernateProxy h ? h.getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
+        PhoneNumber ph = (PhoneNumber) o;
+        return getId() != null && Objects.equals(getId(), ph.getId());
     }
 }
