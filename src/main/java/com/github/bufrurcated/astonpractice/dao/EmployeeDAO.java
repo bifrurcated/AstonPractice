@@ -4,11 +4,8 @@ import com.github.bufrurcated.astonpractice.entity.Employee;
 import com.github.bufrurcated.astonpractice.errors.NotFoundSQLException;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.internal.TransactionManagement;
-import org.hibernate.query.NativeQuery;
 
-import java.sql.*;
-import java.util.ArrayList;
+import java.sql.SQLException;
 import java.util.List;
 
 public class EmployeeDAO extends AbstractDao implements Dao<Employee, Long> {
@@ -33,8 +30,9 @@ public class EmployeeDAO extends AbstractDao implements Dao<Employee, Long> {
     @Override
     public List<Employee> findAll() throws SQLException {
         try (var session = openSession()) {
-            var sql = "SELECT id, first_name, last_name, age FROM employees";
-            var query = session.createNativeQuery(sql, Employee.class);
+            //var sql = "SELECT id, first_name, last_name, age FROM employees";
+            var hql = "FROM Employee e ORDER BY e.id";
+            var query = session.createQuery(hql, Employee.class);
             var results = query.list();
             if (results.isEmpty()) {
                 throw new NotFoundSQLException();

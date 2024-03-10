@@ -16,6 +16,8 @@
         <mapping class="com.github.bufrurcated.astonpractice.entity.Employee"/>
         <mapping class="com.github.bufrurcated.astonpractice.entity.Department"/>
         <mapping class="com.github.bufrurcated.astonpractice.entity.PhoneNumber"/>
+        <mapping class="com.github.bufrurcated.astonpractice.entity.ExternalEmployee"/>
+        <mapping class="com.github.bufrurcated.astonpractice.entity.InternalEmployee"/>
 <!--        <mapping resource="mapping/Address.hbm.xml"/>-->
 <!--        <mapping resource="mapping/Employee.hbm.xml"/>-->
 <!--        <mapping resource="mapping/Project.hbm.xml"/>-->
