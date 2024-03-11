@@ -21,7 +21,7 @@ public class Employee extends AbstractEntity {
     private String lastName;
     @Column(name = "age", nullable = false)
     private int age;
-    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "employee", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
     private List<PhoneNumber> phoneNumbers = new ArrayList<>();
     @ManyToMany(
