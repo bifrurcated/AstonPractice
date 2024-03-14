@@ -13,8 +13,10 @@ import java.util.*;
 @Entity
 @Table(name = "employees")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class Employee extends AbstractEntity {
-
+public class Employee {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "incrementor")
+    private Long id;
     @Column(name = "first_name", nullable = false)
     private String firstName;
     @Column(name = "last_name", nullable = false)
@@ -42,7 +44,7 @@ public class Employee extends AbstractEntity {
     }
 
     public Employee(Long id, String firstName, String lastName, int age, List<PhoneNumber> phoneNumbers, List<Department> departments) {
-        super(id);
+        this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.age = age;
@@ -59,5 +61,10 @@ public class Employee extends AbstractEntity {
         if (thisEffectiveClass != oEffectiveClass) return false;
         Employee employee = (Employee) o;
         return getId() != null && Objects.equals(getId(), employee.getId());
+    }
+
+    @Override
+    public final int hashCode() {
+        return this instanceof HibernateProxy h ? h.getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
 }

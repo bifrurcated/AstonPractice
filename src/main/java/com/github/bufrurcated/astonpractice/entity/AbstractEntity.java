@@ -13,7 +13,7 @@ import org.hibernate.proxy.HibernateProxy;
 @MappedSuperclass
 public abstract class AbstractEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "incrementor")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     public AbstractEntity() {
