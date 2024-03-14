@@ -17,7 +17,6 @@ public class EmployeeService {
         this.dao = dao;
     }
 
-    @Transactional
     public void add(Employee employee) throws ResponseStatusException {
         try {
             dao.save(employee);

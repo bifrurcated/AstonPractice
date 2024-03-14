@@ -2,6 +2,7 @@ package com.github.bufrurcated.astonpractice.service;
 
 import com.github.bufrurcated.astonpractice.dao.DepartmentDAO;
 import com.github.bufrurcated.astonpractice.dao.EmplDepartDAO;
+import com.github.bufrurcated.astonpractice.dao.EmplDepartN1DAO;
 import com.github.bufrurcated.astonpractice.dao.EmployeeDAO;
 import com.github.bufrurcated.astonpractice.db.ConfigurationDB;
 import com.github.bufrurcated.astonpractice.entity.Department;
@@ -14,6 +15,7 @@ public class EmplDepartServiceTest {
 
     private ConfigurationDB configurationDB;
     private EmplDepartService emplDepartService;
+    private EmplDepartService emplDepartServiceN1;
 
     @SneakyThrows
     @BeforeEach
@@ -35,6 +37,8 @@ public class EmplDepartServiceTest {
         var department = new Department();
         department.setName("Programmer");
         departmentService.add(department);
+
+        emplDepartServiceN1 = new EmplDepartService(new EmplDepartN1DAO(configurationDB.getSessionFactory()));
     }
 
     @SneakyThrows
@@ -44,7 +48,18 @@ public class EmplDepartServiceTest {
     }
 
     @Test
-    public void testAddEmplDepart() throws Exception {
+    public void testAddEmplDepartN1Problem() throws Exception {
+        EmplDepart emplDepart = new EmplDepart(1L, 1L);
+        emplDepartServiceN1.add(emplDepart);
+
+        var getEmplDepart = new EmplDepart(1L, null);
+        var result = emplDepartServiceN1.get(getEmplDepart);
+        var expected = new EmplDepart(1L, 1L);
+        Assertions.assertEquals(expected, result.getFirst());
+    }
+
+    @Test
+    public void testAddEmplDepartWithoutN1Problem() throws Exception {
         EmplDepart emplDepart = new EmplDepart(1L, 1L);
         emplDepartService.add(emplDepart);
 

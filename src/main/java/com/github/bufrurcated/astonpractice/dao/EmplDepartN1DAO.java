@@ -14,9 +14,9 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Slf4j
-public class EmplDepartDAO extends AbstractDao implements Dao<EmplDepart, EmplDepart> {
+public class EmplDepartN1DAO extends AbstractDao implements Dao<EmplDepart, EmplDepart> {
 
-    public EmplDepartDAO(SessionFactory sessionFactory) {
+    public EmplDepartN1DAO(SessionFactory sessionFactory) {
         super(sessionFactory);
     }
 
@@ -30,17 +30,14 @@ public class EmplDepartDAO extends AbstractDao implements Dao<EmplDepart, EmplDe
                 tx.rollback();
                 throw new DepartmentNotFoundSQLException();
             }
-            String hql = "SELECT e FROM Employee e LEFT JOIN FETCH e.departments WHERE e.id = :id";
-            var emp = session.createQuery(hql, Employee.class)
-                    .setParameter("id", emplDepart.getEmployeeId())
-                    .list();
-            if (emp.isEmpty()) {
+            var emp = session.get(Employee.class, emplDepart.getEmployeeId());
+            if (emp == null) {
                 tx.rollback();
                 throw new EmployeeNotFoundSQLException();
             }
-            var employee = emp.getFirst();
-            employee.getDepartments().add(dpt);
-            session.merge(employee);
+            //Дополнительно создаётся запрос на вытягивание коллекции
+            emp.getDepartments().add(dpt);
+            session.merge(emp);
             tx.commit();
         } catch (Exception e) {
             log.error(e.getMessage());
