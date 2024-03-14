@@ -30,7 +30,7 @@ public class EmployeeSpicificFindDAO extends AbstractDao implements Dao<Employee
     @Override
     public List<Employee> findAll() throws SQLException {
         try (var session = openSession()) {
-            var hql = "SELECT e FROM Employee e WHERE age > 2000 ORDER BY e.id";
+            var hql = "SELECT e FROM Employee e WHERE e.age > 2000";
             var query = session.createQuery(hql, Employee.class);
             var results = query.list();
             if (results.isEmpty()) {

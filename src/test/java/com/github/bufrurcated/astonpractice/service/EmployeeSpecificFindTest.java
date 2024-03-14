@@ -20,7 +20,7 @@ public class EmployeeSpecificFindTest {
     private static EmployeeService employeeSpecificFind;
     private static ConfigurationDB configuration;
 
-    private static long timeWithoutIndex;
+    private static long timeWithoutIndex = 10000;
 
     @SneakyThrows
     @BeforeAll
@@ -34,7 +34,7 @@ public class EmployeeSpecificFindTest {
             employeeList.add(Employee.builder()
                     .firstName(UUID.randomUUID().toString())
                     .lastName(UUID.randomUUID().toString())
-                    .age(randomGenerator.nextInt(18, 10000))
+                    .age(randomGenerator.nextInt(1000, 100000))
                     .build());
         }
         int countParallelTask = 2000;
@@ -74,7 +74,7 @@ public class EmployeeSpecificFindTest {
         configuration.shutdown();
     }
 
-    @Test
+    @RepeatedTest(5)
     @Order(1)
     @SneakyThrows
     void testGetAllRowsWhereAgeGreater2000() {
@@ -84,7 +84,9 @@ public class EmployeeSpecificFindTest {
         long result = end - start;
         log.info("time: " + result);
         log.info("asd" + employeesWhereAgeGreater2000.getFirst().toString());
-        timeWithoutIndex = result;
+        if (result < timeWithoutIndex) {
+            timeWithoutIndex = result;
+        }
     }
 
     @Test
@@ -106,4 +108,18 @@ public class EmployeeSpecificFindTest {
         log.info("asd" + employeesWhereAgeGreater2000.getFirst().toString());
         Assertions.assertTrue(result < timeWithoutIndex);
     }
+
+    @Order(3)
+    @RepeatedTest(5)
+    @SneakyThrows
+    void testGetAllRowsWhereAgeGreater2000OptimizationWithIndexRepeat() {
+        long start = System.currentTimeMillis();
+        var employeesWhereAgeGreater2000 = employeeSpecificFind.getAll();
+        long end = System.currentTimeMillis();
+        long result = end - start;
+        log.info("time: " + result);
+        log.info("asd" + employeesWhereAgeGreater2000.getFirst().toString());
+        Assertions.assertTrue(result < timeWithoutIndex);
+    }
+
 }
