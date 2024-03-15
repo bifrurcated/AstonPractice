@@ -2,8 +2,11 @@ package com.github.bufrurcated.astonpractice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.proxy.HibernateProxy;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.*;
 
 @Getter
@@ -13,7 +16,11 @@ import java.util.*;
 @Entity
 @Table(name = "employees")
 @Inheritance(strategy = InheritanceType.JOINED)
-public class Employee {
+@Cacheable
+@org.hibernate.annotations.Cache(usage = CacheConcurrencyStrategy.NONSTRICT_READ_WRITE)
+public class Employee implements Serializable {
+    @Serial
+    private static final long serialVersionUID = 7825808328523472983L;
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "incrementor")
     private Long id;

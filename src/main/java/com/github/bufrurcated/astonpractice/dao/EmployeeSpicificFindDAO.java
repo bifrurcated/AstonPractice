@@ -32,6 +32,7 @@ public class EmployeeSpicificFindDAO extends AbstractDao implements Dao<Employee
         try (var session = openSession()) {
             var hql = "SELECT e FROM Employee e WHERE e.age > 2000";
             var query = session.createQuery(hql, Employee.class);
+            query.setCacheable(true);
             var results = query.list();
             if (results.isEmpty()) {
                 throw new NotFoundSQLException();
@@ -46,6 +47,7 @@ public class EmployeeSpicificFindDAO extends AbstractDao implements Dao<Employee
             String hql = "SELECT e FROM Employee e WHERE e.id = :id AND age > 2000";
             var employees = session.createQuery(hql, Employee.class)
                     .setParameter("id", id)
+                    .setHint("org.hibernate.cacheable", true)
                     .list();
             if (employees.isEmpty()) {
                 throw new NotFoundSQLException();
