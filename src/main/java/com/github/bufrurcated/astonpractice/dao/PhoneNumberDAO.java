@@ -5,18 +5,13 @@ import com.github.bufrurcated.astonpractice.entity.Employee;
 import com.github.bufrurcated.astonpractice.entity.PhoneNumber;
 import com.github.bufrurcated.astonpractice.errors.EmployeeNotFoundSQLException;
 import com.github.bufrurcated.astonpractice.errors.NotFoundSQLException;
-import jdk.jshell.spi.ExecutionControlProvider;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.cache.internal.EnabledCaching;
-import org.hibernate.query.NativeQuery;
 
-import java.sql.*;
-import java.util.ArrayList;
+import java.sql.SQLException;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
-public class PhoneNumberDAO extends AbstractDao implements Dao<PhoneNumber, FindNumber> {
+public class PhoneNumberDAO extends AbstractDao<PhoneNumber, FindNumber> {
     public PhoneNumberDAO(SessionFactory sessionFactory) {
         super(sessionFactory);
     }

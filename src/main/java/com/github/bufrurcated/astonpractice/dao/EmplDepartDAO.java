@@ -14,7 +14,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Slf4j
-public class EmplDepartDAO extends AbstractDao implements Dao<EmplDepart, EmplDepart> {
+public class EmplDepartDAO extends AbstractDao<EmplDepart, EmplDepart> {
 
     public EmplDepartDAO(SessionFactory sessionFactory) {
         super(sessionFactory);

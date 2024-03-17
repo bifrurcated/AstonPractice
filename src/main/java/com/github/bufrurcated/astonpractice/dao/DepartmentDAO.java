@@ -16,15 +16,7 @@ public class DepartmentDAO extends AbstractDao implements Dao<Department, Long> 
 
     @Override
     public void save(Department department) throws SQLException {
-        Transaction tx = null;
-        try (var session = openSession()) {
-            tx = session.beginTransaction();
-            session.persist(department);
-            tx.commit();
-        } catch (Exception e) {
-            if (tx != null) tx.rollback();
-            throw e;
-        }
+        super.save(department);
     }
 
     @Override

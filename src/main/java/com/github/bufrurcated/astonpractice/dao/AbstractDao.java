@@ -2,13 +2,12 @@ package com.github.bufrurcated.astonpractice.dao;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java.sql.SQLException;
 
-public abstract class AbstractDao {
+public abstract class AbstractDao<T, K> implements Dao<T, K>{
     private final SessionFactory sessionFactory;
-    protected Session sessionRemove;
 
     public AbstractDao(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
@@ -18,11 +17,16 @@ public abstract class AbstractDao {
         return sessionFactory.openSession();
     }
 
-    public void inTransaction(Consumer<Session> action) {
-        sessionFactory.inTransaction(action);
-    }
-
-    public <R> R fromTransaction(Function<Session, R> action) {
-        return sessionFactory.fromTransaction(action);
+    @Override
+    public void save(T val) throws SQLException {
+        Transaction tx = null;
+        try (var session = openSession()) {
+            tx = session.beginTransaction();
+            session.persist(val);
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null) tx.rollback();
+            throw e;
+        }
     }
 }

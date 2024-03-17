@@ -8,7 +8,7 @@ import org.hibernate.Transaction;
 import java.sql.SQLException;
 import java.util.List;
 
-public class EmployeeWithDepartmentsDAO extends AbstractDao implements Dao<Employee, Long> {
+public class EmployeeWithDepartmentsDAO extends AbstractDao<Employee, Long> {
 
     public EmployeeWithDepartmentsDAO(SessionFactory sessionFactory) {
         super(sessionFactory);
@@ -16,15 +16,7 @@ public class EmployeeWithDepartmentsDAO extends AbstractDao implements Dao<Emplo
 
     @Override
     public void save(Employee employee) throws SQLException {
-        Transaction tx = null;
-        try (var session = openSession()) {
-            tx = session.beginTransaction();
-            session.persist(employee);
-            tx.commit();
-        } catch (Exception e) {
-            if (tx != null) tx.rollback();
-            throw e;
-        }
+        super.save(employee);
     }
 
     @Override
