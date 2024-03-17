@@ -1,6 +1,6 @@
 package com.github.bufrurcated.astonpractice.service;
 
-import com.github.bufrurcated.astonpractice.dao.EmployeeSpicificFindDAO;
+import com.github.bufrurcated.astonpractice.dao.EmployeeSpecificFindDAO;
 import com.github.bufrurcated.astonpractice.db.ConfigurationDB;
 import com.github.bufrurcated.astonpractice.entity.Employee;
 import lombok.SneakyThrows;
@@ -26,7 +26,7 @@ public class EmployeeSpecificFindTest {
     @BeforeAll
     static void init(){
         configuration = new ConfigurationDB();
-        employeeSpecificFind = new EmployeeService(new EmployeeSpicificFindDAO(configuration.getSessionFactory()));
+        employeeSpecificFind = new EmployeeService(new EmployeeSpecificFindDAO(configuration.getSessionFactory()));
 
         RandomGenerator randomGenerator = RandomGenerator.getDefault();
         List<Employee> employeeList = new ArrayList<>(2_000_000);

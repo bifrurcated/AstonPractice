@@ -46,15 +46,7 @@ public class EmployeeDAO extends AbstractDao<Employee, Long> {
 
     @Override
     public void update(Employee employee) throws SQLException {
-        Transaction tx = null;
-        try (var session = openSession()) {
-            tx = session.beginTransaction();
-            session.merge(employee);
-            tx.commit();
-        } catch (Exception e) {
-            if (tx != null) tx.rollback();
-            throw e;
-        }
+        super.update(employee);
     }
 
     @Override

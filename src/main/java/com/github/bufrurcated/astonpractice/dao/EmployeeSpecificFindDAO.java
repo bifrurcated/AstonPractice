@@ -7,17 +7,23 @@ import org.hibernate.SessionFactory;
 import java.sql.SQLException;
 import java.util.List;
 
-public class EmployeeWithDepartmentsDAO extends EmployeeDAO {
+public class EmployeeSpecificFindDAO extends EmployeeDAO {
 
-    public EmployeeWithDepartmentsDAO(SessionFactory sessionFactory) {
+    public EmployeeSpecificFindDAO(SessionFactory sessionFactory) {
         super(sessionFactory);
+    }
+
+    @Override
+    public void save(Employee employee) throws SQLException {
+        super.save(employee);
     }
 
     @Override
     public List<Employee> findAll() throws SQLException {
         try (var session = openSession()) {
-            var hql = "FROM Employee e LEFT JOIN FETCH e.departments ORDER BY e.id";
+            var hql = "SELECT e FROM Employee e WHERE e.age > 2000";
             var query = session.createQuery(hql, Employee.class);
+            query.setCacheable(true);
             var results = query.list();
             if (results.isEmpty()) {
                 throw new NotFoundSQLException();
@@ -29,14 +35,15 @@ public class EmployeeWithDepartmentsDAO extends EmployeeDAO {
     @Override
     public List<Employee> find(Long id) throws SQLException {
         try (var session = openSession()) {
-            var hql = "SELECT e FROM Employee e LEFT JOIN FETCH e.departments WHERE e.id = :id";
-            var result = session.createQuery(hql, Employee.class)
+            String hql = "SELECT e FROM Employee e WHERE e.id = :id AND age > 2000";
+            var employees = session.createQuery(hql, Employee.class)
                     .setParameter("id", id)
+                    .setHint("org.hibernate.cacheable", true)
                     .list();
-            if (result.isEmpty()) {
+            if (employees.isEmpty()) {
                 throw new NotFoundSQLException();
             }
-            return result;
+            return employees;
         }
     }
 }

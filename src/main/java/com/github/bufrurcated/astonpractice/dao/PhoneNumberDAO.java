@@ -79,15 +79,7 @@ public class PhoneNumberDAO extends AbstractDao<PhoneNumber, FindNumber> {
 
     @Override
     public void update(PhoneNumber phoneNumber) throws SQLException {
-        Transaction tx = null;
-        try (var session = openSession()) {
-            tx = session.beginTransaction();
-            session.merge(phoneNumber);
-            tx.commit();
-        } catch (Exception e) {
-            if (tx != null) tx.rollback();
-            throw e;
-        }
+        super.update(phoneNumber);
     }
 
     @Override
