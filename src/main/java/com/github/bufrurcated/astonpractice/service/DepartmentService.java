@@ -6,10 +6,12 @@ import com.github.bufrurcated.astonpractice.errors.DepartmentNotFoundError;
 import com.github.bufrurcated.astonpractice.errors.NotFoundSQLException;
 import com.github.bufrurcated.astonpractice.errors.ResponseStatusException;
 import com.github.bufrurcated.astonpractice.errors.SQLError;
+import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
 import java.util.List;
 
+@Service
 public class DepartmentService {
     private final Dao<Department, Long> dao;
 

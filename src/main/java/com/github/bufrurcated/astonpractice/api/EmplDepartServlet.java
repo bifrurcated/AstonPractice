@@ -1,38 +1,26 @@
 package com.github.bufrurcated.astonpractice.api;
 
-import com.github.bufrurcated.astonpractice.dao.EmplDepartDAO;
-import com.github.bufrurcated.astonpractice.db.DatabaseSource;
-import com.github.bufrurcated.astonpractice.dto.*;
-import com.github.bufrurcated.astonpractice.entity.Department;
-import com.github.bufrurcated.astonpractice.entity.EmplDepart;
-import com.github.bufrurcated.astonpractice.errors.ResponseStatusException;
 import com.github.bufrurcated.astonpractice.mapper.EmplDepartMapper;
 import com.github.bufrurcated.astonpractice.service.EmplDepartService;
 import com.github.bufrurcated.astonpractice.utils.Parse;
-import jakarta.servlet.ServletConfig;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
+import java.io.Serial;
 
-@WebServlet(urlPatterns = {"/api/v1/employee-department"})
+@RequiredArgsConstructor
+@Component
 public class EmplDepartServlet extends HttpServlet {
-    private EmplDepartService service;
-    private final EmplDepartMapper emplDepartMapper = new EmplDepartMapper();
+    @Serial
+    private static final long serialVersionUID = 1960818093158963997L;
 
-    @Override
-    public void init() throws ServletException {
-        var sessionFactory = DatabaseSource.getSessionFactory();
-        var dao = new EmplDepartDAO(sessionFactory);
-        service = new EmplDepartService(dao);
-    }
+    private final EmplDepartService service;
+    private final EmplDepartMapper emplDepartMapper;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

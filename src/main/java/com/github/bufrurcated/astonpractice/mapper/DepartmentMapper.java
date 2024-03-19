@@ -4,9 +4,10 @@ import com.github.bufrurcated.astonpractice.dto.RequestCreateDepartment;
 import com.github.bufrurcated.astonpractice.dto.RequestUpdateDepartment;
 import com.github.bufrurcated.astonpractice.dto.ResponseDepartment;
 import com.github.bufrurcated.astonpractice.entity.Department;
+import org.springframework.stereotype.Component;
 
+@Component
 public class DepartmentMapper {
-
 
     public ResponseDepartment map(Department department) {
         return new ResponseDepartment(department.getId(), department.getName());

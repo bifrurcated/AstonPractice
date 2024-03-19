@@ -9,11 +9,13 @@ import com.github.bufrurcated.astonpractice.errors.NotFoundSQLException;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.springframework.stereotype.Repository;
 
 import java.sql.SQLException;
 import java.util.List;
 
 @Slf4j
+@Repository
 public class EmplDepartDAO extends AbstractDao<EmplDepart, EmplDepart> {
 
     public EmplDepartDAO(SessionFactory sessionFactory) {

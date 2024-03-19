@@ -1,36 +1,27 @@
 package com.github.bufrurcated.astonpractice.api;
 
-import com.github.bufrurcated.astonpractice.dao.DepartmentDAO;
-import com.github.bufrurcated.astonpractice.db.DatabaseSource;
-import com.github.bufrurcated.astonpractice.dto.ResponseDepartment;
-import com.github.bufrurcated.astonpractice.entity.Department;
-import com.github.bufrurcated.astonpractice.errors.ResponseStatusException;
 import com.github.bufrurcated.astonpractice.mapper.DepartmentMapper;
 import com.github.bufrurcated.astonpractice.service.DepartmentService;
 import com.github.bufrurcated.astonpractice.utils.Parse;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.List;
+import java.io.Serial;
 import java.util.Optional;
 
-@WebServlet(urlPatterns = {"/api/v1/department/*"})
+@RequiredArgsConstructor
+@Component
 public class DepartmentServlet extends HttpServlet {
-    private DepartmentService service;
-    private final DepartmentMapper departmentMapper = new DepartmentMapper();
+    @Serial
+    private static final long serialVersionUID = -8381272867247581720L;
 
-    @Override
-    public void init() throws ServletException {
-        var sessionFactory = DatabaseSource.getSessionFactory();
-        var dao = new DepartmentDAO(sessionFactory);
-        service = new DepartmentService(dao);
-    }
+    private final DepartmentService service;
+    private final DepartmentMapper departmentMapper;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

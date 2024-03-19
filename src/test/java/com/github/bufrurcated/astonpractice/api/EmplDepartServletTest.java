@@ -4,11 +4,11 @@ import com.github.bufrurcated.astonpractice.dao.DepartmentDAO;
 import com.github.bufrurcated.astonpractice.dao.EmplDepartDAO;
 import com.github.bufrurcated.astonpractice.dao.EmployeeDAO;
 import com.github.bufrurcated.astonpractice.db.ConfigurationDB;
-import com.github.bufrurcated.astonpractice.dto.ResponseDepartment;
 import com.github.bufrurcated.astonpractice.dto.ResponseEmplDepart;
 import com.github.bufrurcated.astonpractice.entity.Department;
 import com.github.bufrurcated.astonpractice.entity.EmplDepart;
 import com.github.bufrurcated.astonpractice.entity.Employee;
+import com.github.bufrurcated.astonpractice.mapper.EmplDepartMapper;
 import com.github.bufrurcated.astonpractice.service.DepartmentService;
 import com.github.bufrurcated.astonpractice.service.EmplDepartService;
 import com.github.bufrurcated.astonpractice.service.EmployeeService;
@@ -16,9 +16,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.SneakyThrows;
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -34,16 +32,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class EmplDepartServletTest {
-    private static EmplDepartServlet servlet;
+    private EmplDepartServlet servlet;
     private StringWriter writer;
     private ConfigurationDB configurationDB;
-
-    @BeforeAll
-    @SneakyThrows
-    static void init() {
-        servlet = new EmplDepartServlet();
-        servlet.init();
-    }
 
     @BeforeEach
     @SneakyThrows
@@ -61,6 +52,7 @@ class EmplDepartServletTest {
         emplDepartService.add(new EmplDepart(1L, 2L));
         emplDepartService.add(new EmplDepart(2L, 1L));
         emplDepartService.add(new EmplDepart(3L, 2L));
+        servlet = new EmplDepartServlet(emplDepartService, new EmplDepartMapper());
         writer = new StringWriter();
     }
 

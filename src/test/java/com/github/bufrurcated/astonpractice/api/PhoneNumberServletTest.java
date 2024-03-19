@@ -6,6 +6,7 @@ import com.github.bufrurcated.astonpractice.db.ConfigurationDB;
 import com.github.bufrurcated.astonpractice.dto.ResponsePhoneNumber;
 import com.github.bufrurcated.astonpractice.entity.Employee;
 import com.github.bufrurcated.astonpractice.entity.PhoneNumber;
+import com.github.bufrurcated.astonpractice.mapper.PhoneNumberMapper;
 import com.github.bufrurcated.astonpractice.service.EmployeeService;
 import com.github.bufrurcated.astonpractice.service.PhoneNumberService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,16 +32,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class PhoneNumberServletTest {
-    private static PhoneNumberServlet servlet;
+    private PhoneNumberServlet servlet;
     private StringWriter writer;
     private ConfigurationDB configurationDB;
 
-    @BeforeAll
-    @SneakyThrows
-    static void init() {
-        servlet = new PhoneNumberServlet();
-        servlet.init();
-    }
 
     @BeforeEach
     @SneakyThrows
@@ -55,7 +50,7 @@ class PhoneNumberServletTest {
         phoneNumberService.add(PhoneNumber.builder().phoneNumber("89243423412").employee(Employee.builder().id(1L).build()).build());
         phoneNumberService.add(PhoneNumber.builder().phoneNumber("+123412515216").employee(Employee.builder().id(2L).build()).build());
         phoneNumberService.add(PhoneNumber.builder().phoneNumber("+23412515216").employee(Employee.builder().id(3L).build()).build());
-
+        servlet = new PhoneNumberServlet(phoneNumberService, new PhoneNumberMapper());
         writer = new StringWriter();
     }
 

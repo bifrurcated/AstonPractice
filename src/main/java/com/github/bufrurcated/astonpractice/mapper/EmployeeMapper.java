@@ -4,7 +4,9 @@ import com.github.bufrurcated.astonpractice.dto.RequestCreateEmployee;
 import com.github.bufrurcated.astonpractice.dto.RequestUpdateEmployee;
 import com.github.bufrurcated.astonpractice.dto.ResponseEmployee;
 import com.github.bufrurcated.astonpractice.entity.Employee;
+import org.springframework.stereotype.Component;
 
+@Component
 public class EmployeeMapper {
     public Employee map(RequestCreateEmployee requestCreateEmployee) {
         var employee = new Employee();

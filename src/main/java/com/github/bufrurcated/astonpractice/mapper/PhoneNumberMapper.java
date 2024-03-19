@@ -5,7 +5,9 @@ import com.github.bufrurcated.astonpractice.dto.RequestUpdatePhoneNumber;
 import com.github.bufrurcated.astonpractice.dto.ResponsePhoneNumber;
 import com.github.bufrurcated.astonpractice.entity.Employee;
 import com.github.bufrurcated.astonpractice.entity.PhoneNumber;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PhoneNumberMapper {
     public ResponsePhoneNumber map(PhoneNumber phoneNumber) {
         return new ResponsePhoneNumber(phoneNumber.getId(), phoneNumber.getEmployee().getId(), phoneNumber.getPhoneNumber());

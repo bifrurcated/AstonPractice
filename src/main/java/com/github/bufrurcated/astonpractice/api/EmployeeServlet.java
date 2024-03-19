@@ -1,36 +1,27 @@
 package com.github.bufrurcated.astonpractice.api;
 
-import com.github.bufrurcated.astonpractice.dao.EmployeeDAO;
-import com.github.bufrurcated.astonpractice.db.DatabaseSource;
-import com.github.bufrurcated.astonpractice.dto.ResponseEmployee;
-import com.github.bufrurcated.astonpractice.entity.Employee;
-import com.github.bufrurcated.astonpractice.errors.ResponseStatusException;
 import com.github.bufrurcated.astonpractice.mapper.EmployeeMapper;
 import com.github.bufrurcated.astonpractice.service.EmployeeService;
 import com.github.bufrurcated.astonpractice.utils.Parse;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.List;
+import java.io.Serial;
 import java.util.Optional;
 
-@WebServlet(urlPatterns = {"/api/v1/employees/*"})
+@RequiredArgsConstructor
+@Component
 public class EmployeeServlet extends HttpServlet {
-    private EmployeeService service;
-    private final EmployeeMapper employeeMapper = new EmployeeMapper();
+    @Serial
+    private static final long serialVersionUID = -7270386533793068282L;
 
-    @Override
-    public void init() throws ServletException {
-        var sessionFactory = DatabaseSource.getSessionFactory();
-        var dao = new EmployeeDAO(sessionFactory);
-        service = new EmployeeService(dao);
-    }
+    private final EmployeeService service;
+    private final EmployeeMapper employeeMapper;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

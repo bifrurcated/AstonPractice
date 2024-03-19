@@ -7,10 +7,12 @@ import com.github.bufrurcated.astonpractice.errors.EmployeeNotFoundSQLException;
 import com.github.bufrurcated.astonpractice.errors.NotFoundSQLException;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.springframework.stereotype.Repository;
 
 import java.sql.SQLException;
 import java.util.List;
 
+@Repository
 public class PhoneNumberDAO extends AbstractDao<PhoneNumber, FindNumber> {
     public PhoneNumberDAO(SessionFactory sessionFactory) {
         super(sessionFactory);

@@ -4,6 +4,7 @@ import com.github.bufrurcated.astonpractice.dao.EmployeeDAO;
 import com.github.bufrurcated.astonpractice.dto.ResponseEmployee;
 import com.github.bufrurcated.astonpractice.entity.Employee;
 import com.github.bufrurcated.astonpractice.db.ConfigurationDB;
+import com.github.bufrurcated.astonpractice.mapper.EmployeeMapper;
 import com.github.bufrurcated.astonpractice.service.EmployeeService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,16 +22,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class EmployeeServletTest {
-    private static EmployeeServlet servlet;
+    private EmployeeServlet servlet;
     private StringWriter writer;
     private ConfigurationDB configurationDB;
-
-    @BeforeAll
-    @SneakyThrows
-    static void init() {
-        servlet = new EmployeeServlet();
-        servlet.init();
-    }
 
     @BeforeEach
     @SneakyThrows
@@ -40,6 +34,7 @@ class EmployeeServletTest {
         employeeService.add(Employee.builder().firstName("Nick").lastName("Jordan").age(19).build());
         employeeService.add(Employee.builder().firstName("Jonh").lastName("Mike").age(35).build());
         employeeService.add(Employee.builder().firstName("Artyom").lastName("Vedoseev").age(25).build());
+        servlet = new EmployeeServlet(employeeService, new EmployeeMapper());
         writer = new StringWriter();
     }
 

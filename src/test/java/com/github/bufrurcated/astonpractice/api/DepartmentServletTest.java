@@ -4,6 +4,7 @@ import com.github.bufrurcated.astonpractice.dao.DepartmentDAO;
 import com.github.bufrurcated.astonpractice.db.ConfigurationDB;
 import com.github.bufrurcated.astonpractice.dto.ResponseDepartment;
 import com.github.bufrurcated.astonpractice.entity.Department;
+import com.github.bufrurcated.astonpractice.mapper.DepartmentMapper;
 import com.github.bufrurcated.astonpractice.service.DepartmentService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,7 +12,6 @@ import lombok.SneakyThrows;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -27,16 +27,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class DepartmentServletTest {
-    private static DepartmentServlet servlet;
+    private DepartmentServlet servlet;
     private StringWriter writer;
     private ConfigurationDB configurationDB;
-
-    @BeforeAll
-    @SneakyThrows
-    static void init() {
-        servlet = new DepartmentServlet();
-        servlet.init();
-    }
 
     @BeforeEach
     @SneakyThrows
@@ -45,6 +38,7 @@ class DepartmentServletTest {
         var departmentService = new DepartmentService(new DepartmentDAO(configurationDB.getSessionFactory()));
         departmentService.add(Department.builder().name("Back-end").build());
         departmentService.add(Department.builder().name("Front-end").build());
+        servlet = new DepartmentServlet(departmentService, new DepartmentMapper());
         writer = new StringWriter();
     }
 

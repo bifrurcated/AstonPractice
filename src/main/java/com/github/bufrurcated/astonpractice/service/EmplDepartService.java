@@ -3,10 +3,12 @@ package com.github.bufrurcated.astonpractice.service;
 import com.github.bufrurcated.astonpractice.dao.Dao;
 import com.github.bufrurcated.astonpractice.entity.EmplDepart;
 import com.github.bufrurcated.astonpractice.errors.*;
+import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
 import java.util.List;
 
+@Service
 public class EmplDepartService {
     private final Dao<EmplDepart, EmplDepart> dao;
 

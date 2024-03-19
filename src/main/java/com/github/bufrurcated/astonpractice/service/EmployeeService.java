@@ -1,15 +1,17 @@
 package com.github.bufrurcated.astonpractice.service;
 
 import com.github.bufrurcated.astonpractice.dao.Dao;
-import com.github.bufrurcated.astonpractice.dao.EmployeeDAO;
 import com.github.bufrurcated.astonpractice.entity.Employee;
-import com.github.bufrurcated.astonpractice.errors.*;
-import jakarta.transaction.Transactional;
+import com.github.bufrurcated.astonpractice.errors.EmployeeNotFoundError;
+import com.github.bufrurcated.astonpractice.errors.NotFoundSQLException;
+import com.github.bufrurcated.astonpractice.errors.ResponseStatusException;
+import com.github.bufrurcated.astonpractice.errors.SQLError;
+import org.springframework.stereotype.Service;
 
-import java.sql.*;
-import java.util.ArrayList;
+import java.sql.SQLException;
 import java.util.List;
 
+@Service
 public class EmployeeService {
     private final Dao<Employee, Long> dao;
 

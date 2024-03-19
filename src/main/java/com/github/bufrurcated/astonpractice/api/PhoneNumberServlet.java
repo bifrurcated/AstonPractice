@@ -1,36 +1,27 @@
 package com.github.bufrurcated.astonpractice.api;
 
-import com.github.bufrurcated.astonpractice.dao.PhoneNumberDAO;
-import com.github.bufrurcated.astonpractice.db.DatabaseSource;
-import com.github.bufrurcated.astonpractice.dto.ResponsePhoneNumber;
-import com.github.bufrurcated.astonpractice.entity.PhoneNumber;
-import com.github.bufrurcated.astonpractice.errors.ResponseStatusException;
 import com.github.bufrurcated.astonpractice.mapper.PhoneNumberMapper;
 import com.github.bufrurcated.astonpractice.service.PhoneNumberService;
 import com.github.bufrurcated.astonpractice.utils.Parse;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.json.JSONArray;
-import org.json.JSONObject;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.List;
+import java.io.Serial;
 import java.util.Optional;
 
-@WebServlet(urlPatterns = {"/api/v1/phone-numbers/*"})
+@RequiredArgsConstructor
+@Component
 public class PhoneNumberServlet extends HttpServlet {
-    private PhoneNumberService service;
-    private final PhoneNumberMapper phoneNumberMapper = new PhoneNumberMapper();
+    @Serial
+    private static final long serialVersionUID = -591486146698200784L;
 
-    @Override
-    public void init() throws ServletException {
-        var sessionFactory = DatabaseSource.getSessionFactory();
-        var dao = new PhoneNumberDAO(sessionFactory);
-        service = new PhoneNumberService(dao);
-    }
+    private final PhoneNumberService service;
+    private final PhoneNumberMapper phoneNumberMapper;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

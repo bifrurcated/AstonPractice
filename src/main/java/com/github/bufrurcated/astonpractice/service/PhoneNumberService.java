@@ -4,10 +4,12 @@ import com.github.bufrurcated.astonpractice.dao.Dao;
 import com.github.bufrurcated.astonpractice.dto.FindNumber;
 import com.github.bufrurcated.astonpractice.entity.PhoneNumber;
 import com.github.bufrurcated.astonpractice.errors.*;
+import org.springframework.stereotype.Service;
 
 import java.sql.SQLException;
 import java.util.List;
 
+@Service
 public class PhoneNumberService {
 
     private final Dao<PhoneNumber, FindNumber> dao;
