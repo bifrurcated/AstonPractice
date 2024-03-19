@@ -5,8 +5,6 @@ import org.hibernate.SessionFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import java.util.function.Supplier;
-
 @Slf4j
 @Configuration
 public class HibernateConfig {

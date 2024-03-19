@@ -2,6 +2,7 @@ package com.github.bufrurcated.astonpractice.api;
 
 import com.github.bufrurcated.astonpractice.mapper.PhoneNumberMapper;
 import com.github.bufrurcated.astonpractice.service.PhoneNumberService;
+import com.github.bufrurcated.astonpractice.utils.HttpMethodUtils;
 import com.github.bufrurcated.astonpractice.utils.Parse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -30,41 +31,13 @@ public class PhoneNumberServlet extends HttpServlet {
         if (phoneNumberId.isPresent()) {
             var strId = phoneNumberId.get()[0];
             long id = Parse.stringToLong(resp, strId);
-            PhoneNumber phoneNumber;
-            try {
-                phoneNumber = service.getById(id);
-            } catch (ResponseStatusException exception) {
-                resp.sendError(exception.getStatus(), exception.getReason());
-                throw new RuntimeException(exception.getMessage());
-            }
-            var responsePhoneNumber = phoneNumberMapper.map(phoneNumber);
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.setContentType("application/json");
-            resp.getWriter().write(new JSONObject(responsePhoneNumber).toString());
+            HttpMethodUtils.get(service::getById, id, phoneNumberMapper::map, resp);
         } else if (employeeId.isPresent()) {
             var strId = employeeId.get()[0];
             long id = Parse.stringToLong(resp, strId);
-            List<ResponsePhoneNumber> responsePhoneNumbers;
-            try {
-                responsePhoneNumbers = service.getByEmployeeId(id).stream().map(phoneNumberMapper::map).toList();
-            } catch (ResponseStatusException exception) {
-                resp.sendError(exception.getStatus(), exception.getReason());
-                throw new RuntimeException(exception.getMessage());
-            }
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.setContentType("application/json");
-            resp.getWriter().write(new JSONArray(responsePhoneNumbers).toString());
+            HttpMethodUtils.getAll(service::getByEmployeeId, id, phoneNumberMapper::map, resp);
         } else {
-            List<ResponsePhoneNumber> responsePhoneNumbers;
-            try {
-                responsePhoneNumbers = service.getAll().stream().map(phoneNumberMapper::map).toList();
-            } catch (ResponseStatusException exception) {
-                resp.sendError(exception.getStatus(), exception.getReason());
-                throw new RuntimeException(exception.getMessage());
-            }
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.setContentType("application/json");
-            resp.getWriter().write(new JSONArray(responsePhoneNumbers).toString());
+            HttpMethodUtils.getAll(service::getAll, phoneNumberMapper::map, resp);
         }
     }
 
@@ -73,12 +46,7 @@ public class PhoneNumberServlet extends HttpServlet {
         var body = Parse.getBody(req);
         var requestCreatePhoneNumber = Parse.jsonToCreatePhoneNumber(resp, body);
         var phoneNumber = phoneNumberMapper.map(requestCreatePhoneNumber);
-        try {
-            service.add(phoneNumber);
-        } catch (ResponseStatusException exception) {
-            resp.sendError(exception.getStatus(), exception.getReason());
-            throw new RuntimeException(exception.getMessage());
-        }
+        HttpMethodUtils.execute(service::add, phoneNumber, resp);
         resp.setStatus(HttpServletResponse.SC_CREATED);
         resp.getWriter().write("Phone number created");
     }
@@ -88,12 +56,7 @@ public class PhoneNumberServlet extends HttpServlet {
         var body = Parse.getBody(req);
         var requestUpdatePhoneNumber = Parse.jsonToUpdatePhoneNumber(resp, body);
         var phoneNumber = phoneNumberMapper.map(requestUpdatePhoneNumber);
-        try {
-            service.update(phoneNumber);
-        } catch (ResponseStatusException exception) {
-            resp.sendError(exception.getStatus(), exception.getReason());
-            throw new RuntimeException(exception.getMessage());
-        }
+        HttpMethodUtils.execute(service::update, phoneNumber, resp);
         resp.setStatus(HttpServletResponse.SC_OK);
         resp.getWriter().write("Phone number update");
     }
@@ -105,32 +68,17 @@ public class PhoneNumberServlet extends HttpServlet {
         if (phoneNumberId.isPresent()) {
             var strId = phoneNumberId.get()[0];
             long id = Parse.stringToLong(resp, strId);
-            try {
-                service.removeById(id);
-            } catch (ResponseStatusException exception) {
-                resp.sendError(exception.getStatus(), exception.getReason());
-                throw new RuntimeException(exception.getMessage());
-            }
+            HttpMethodUtils.execute(service::removeById, id, resp);
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.getWriter().write("Phone number deleted");
         } else if (employeeId.isPresent()) {
             var strId = employeeId.get()[0];
             long id = Parse.stringToLong(resp, strId);
-            try {
-                service.removeByEmployeeId(id);
-            } catch (ResponseStatusException exception) {
-                resp.sendError(exception.getStatus(), exception.getReason());
-                throw new RuntimeException(exception.getMessage());
-            }
+            HttpMethodUtils.execute(service::removeByEmployeeId, id, resp);
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.getWriter().write("Phone numbers by employee deleted");
         } else {
-            try {
-                service.removeAll();
-            } catch (ResponseStatusException exception) {
-                resp.sendError(exception.getStatus(), exception.getReason());
-                throw new RuntimeException(exception.getMessage());
-            }
+            HttpMethodUtils.execute(service::removeAll, resp);
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.getWriter().write("Phone numbers deleted");
         }

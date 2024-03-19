@@ -2,6 +2,7 @@ package com.github.bufrurcated.astonpractice.api;
 
 import com.github.bufrurcated.astonpractice.mapper.EmplDepartMapper;
 import com.github.bufrurcated.astonpractice.service.EmplDepartService;
+import com.github.bufrurcated.astonpractice.utils.HttpMethodUtils;
 import com.github.bufrurcated.astonpractice.utils.Parse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -28,27 +29,9 @@ public class EmplDepartServlet extends HttpServlet {
         if (body != null && !body.isEmpty()) {
             var requestEmplDepart = Parse.jsonToEmplDepart(resp, body);
             var emplDepart = emplDepartMapper.map(requestEmplDepart);
-            List<ResponseEmplDepart> responseEmplDeparts;
-            try {
-                responseEmplDeparts = service.get(emplDepart).stream().map(emplDepartMapper::map).toList();
-            } catch (ResponseStatusException exception) {
-                resp.sendError(exception.getStatus(), exception.getReason());
-                throw new RuntimeException(exception.getMessage());
-            }
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.setContentType("application/json");
-            resp.getWriter().write(new JSONArray(responseEmplDeparts).toString());
+            HttpMethodUtils.getAll(service::get, emplDepart, emplDepartMapper::map, resp);
         } else {
-            List<ResponseEmplDepart> responseEmplDeparts;
-            try {
-                responseEmplDeparts = service.getAll().stream().map(emplDepartMapper::map).toList();
-            } catch (ResponseStatusException exception) {
-                resp.sendError(exception.getStatus(), exception.getReason());
-                throw new RuntimeException(exception.getMessage());
-            }
-            resp.setStatus(HttpServletResponse.SC_OK);
-            resp.setContentType("application/json");
-            resp.getWriter().write(new JSONArray(responseEmplDeparts).toString());
+            HttpMethodUtils.getAll(service::getAll, emplDepartMapper::map, resp);
         }
     }
 
@@ -57,12 +40,7 @@ public class EmplDepartServlet extends HttpServlet {
         var body = Parse.getBody(req);
         var requestEmplDepart = Parse.jsonToEmplDepart(resp, body);
         var emplDepart = emplDepartMapper.map(requestEmplDepart);
-        try {
-            service.add(emplDepart);
-        } catch (ResponseStatusException exception) {
-            resp.sendError(exception.getStatus(), exception.getReason());
-            throw new RuntimeException(exception.getMessage());
-        }
+        HttpMethodUtils.execute(service::add, emplDepart, resp);
         resp.setStatus(HttpServletResponse.SC_CREATED);
         resp.getWriter().write("Employee Department created");
     }
@@ -73,21 +51,11 @@ public class EmplDepartServlet extends HttpServlet {
         if (body != null && !body.isEmpty()) {
             var requestEmplDepart = Parse.jsonToEmplDepart(resp, body);
             var emplDepart = emplDepartMapper.map(requestEmplDepart);
-            try {
-                service.remove(emplDepart);
-            } catch (ResponseStatusException exception) {
-                resp.sendError(exception.getStatus(), exception.getReason());
-                throw new RuntimeException(exception.getMessage());
-            }
+            HttpMethodUtils.execute(service::remove, emplDepart, resp);
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.getWriter().write("Employee Department deleted");
         } else {
-            try {
-                service.removeAll();
-            } catch (ResponseStatusException exception) {
-                resp.sendError(exception.getStatus(), exception.getReason());
-                throw new RuntimeException(exception.getMessage());
-            }
+            HttpMethodUtils.execute(service::removeAll, resp);
             resp.setStatus(HttpServletResponse.SC_OK);
             resp.getWriter().write("All Employee Department deleted");
         }
