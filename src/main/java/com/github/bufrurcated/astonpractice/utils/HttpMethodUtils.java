@@ -82,16 +82,16 @@ public class HttpMethodUtils {
         resp.getWriter().write(new JSONObject(responseDTO).toString());
     }
 
-    public static <T, R, V> void doGet(
+    public static <R, V> void doGet(
             HttpServletRequest req,
-            FunctionResponse<T, R> func,
+            FunctionResponse<Long, R> func,
             SupplierResponse<List<? extends R>> supp,
             Function<R, V> mapper,
             HttpServletResponse resp) throws IOException {
         var pathInfo = Optional.ofNullable(req.getPathInfo());
         if (pathInfo.isPresent()) {
             var strId = pathInfo.get().substring(1);
-            T id = (T) Long.valueOf(Parse.stringToLong(resp, strId));
+            var id = Parse.stringToLong(resp, strId);
             HttpMethodUtils.get(func, id, mapper, resp);
         } else {
             HttpMethodUtils.getAll(supp, mapper, resp);
