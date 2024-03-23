@@ -1,9 +1,10 @@
 package com.github.bufrurcated.astonpractice.errors;
 
-import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 public class SQLError extends ResponseStatusException {
     public SQLError(String message) {
-        super(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, message);
+        super(HttpStatus.INTERNAL_SERVER_ERROR, message);
     }
 }

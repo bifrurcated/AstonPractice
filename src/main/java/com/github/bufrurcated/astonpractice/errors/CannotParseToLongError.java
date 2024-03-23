@@ -1,9 +1,10 @@
 package com.github.bufrurcated.astonpractice.errors;
 
-import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 public class CannotParseToLongError extends ResponseStatusException {
     public CannotParseToLongError(String parseValue) {
-        super(HttpServletResponse.SC_BAD_REQUEST, "Cannot parse a " + parseValue + " into a Long" );
+        super(HttpStatus.BAD_REQUEST, "Cannot parse a " + parseValue + " into a Long" );
     }
 }

@@ -4,7 +4,6 @@ import com.github.bufrurcated.astonpractice.dao.Dao;
 import com.github.bufrurcated.astonpractice.entity.Department;
 import com.github.bufrurcated.astonpractice.errors.DepartmentNotFoundError;
 import com.github.bufrurcated.astonpractice.errors.NotFoundSQLException;
-import com.github.bufrurcated.astonpractice.errors.ResponseStatusException;
 import com.github.bufrurcated.astonpractice.errors.SQLError;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +18,7 @@ public class DepartmentService {
         this.dao = dao;
     }
 
-    public void add(Department department) throws ResponseStatusException {
+    public void add(Department department) {
         try {
             dao.save(department);
         } catch (SQLException e) {
@@ -27,7 +26,7 @@ public class DepartmentService {
         }
     }
 
-    public Department getById(Long id) throws ResponseStatusException {
+    public Department getById(Long id) {
         try {
             return dao.find(id).getFirst();
         } catch (NotFoundSQLException e) {
@@ -37,7 +36,7 @@ public class DepartmentService {
         }
     }
 
-    public List<Department> getAll() throws ResponseStatusException {
+    public List<Department> getAll() {
         try {
             return dao.findAll();
         } catch (NotFoundSQLException e) {
@@ -47,7 +46,7 @@ public class DepartmentService {
         }
     }
 
-    public void update(Department department) throws ResponseStatusException {
+    public void update(Department department) {
         try {
             dao.update(department);
         } catch (SQLException e) {
@@ -55,7 +54,7 @@ public class DepartmentService {
         }
     }
 
-    public void removeById(Long id) throws ResponseStatusException {
+    public void removeById(Long id) {
         try {
             dao.delete(id);
         } catch (NotFoundSQLException e) {
@@ -65,7 +64,7 @@ public class DepartmentService {
         }
     }
 
-    public void removeAll() throws ResponseStatusException {
+    public void removeAll() {
         try {
             dao.deleteAll();
         } catch (SQLException e) {

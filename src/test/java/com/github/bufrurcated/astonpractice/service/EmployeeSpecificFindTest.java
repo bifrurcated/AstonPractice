@@ -6,6 +6,7 @@ import com.github.bufrurcated.astonpractice.entity.Employee;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.concurrent.*;
 import java.util.random.RandomGenerator;
 
 @Slf4j
+@EnabledIfEnvironmentVariable(named = "specific_test", matches = "true")
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class EmployeeSpecificFindTest {
 

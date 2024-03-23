@@ -4,7 +4,6 @@ import com.github.bufrurcated.astonpractice.dao.Dao;
 import com.github.bufrurcated.astonpractice.entity.Employee;
 import com.github.bufrurcated.astonpractice.errors.EmployeeNotFoundError;
 import com.github.bufrurcated.astonpractice.errors.NotFoundSQLException;
-import com.github.bufrurcated.astonpractice.errors.ResponseStatusException;
 import com.github.bufrurcated.astonpractice.errors.SQLError;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +18,7 @@ public class EmployeeService {
         this.dao = dao;
     }
 
-    public void add(Employee employee) throws ResponseStatusException {
+    public void add(Employee employee) {
         try {
             dao.save(employee);
         } catch (SQLException e) {
@@ -27,7 +26,7 @@ public class EmployeeService {
         }
     }
 
-    public Employee getById(Long id) throws ResponseStatusException {
+    public Employee getById(Long id) {
         try {
             return dao.find(id).getFirst();
         } catch (NotFoundSQLException e) {
@@ -37,7 +36,7 @@ public class EmployeeService {
         }
     }
 
-    public List<Employee> getAll() throws ResponseStatusException {
+    public List<Employee> getAll() {
         try {
             return dao.findAll();
         } catch (NotFoundSQLException e) {
@@ -47,7 +46,7 @@ public class EmployeeService {
         }
     }
 
-    public void update(Employee employee) throws ResponseStatusException {
+    public void update(Employee employee) {
         try {
             dao.update(employee);
         } catch (SQLException e) {
@@ -55,7 +54,7 @@ public class EmployeeService {
         }
     }
 
-    public void removeById(Long id) throws ResponseStatusException {
+    public void removeById(Long id) {
         try {
             dao.delete(id);
         } catch (NotFoundSQLException e) {
@@ -65,7 +64,7 @@ public class EmployeeService {
         }
     }
 
-    public void removeAll() throws ResponseStatusException {
+    public void removeAll() {
         try {
             dao.deleteAll();
         } catch (NotFoundSQLException e) {

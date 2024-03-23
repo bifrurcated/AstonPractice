@@ -16,7 +16,7 @@ public class EmplDepartService {
         this.dao = dao;
     }
 
-    public void add(EmplDepart emplDepart) throws ResponseStatusException {
+    public void add(EmplDepart emplDepart) {
         try {
             dao.save(emplDepart);
         } catch (EmployeeNotFoundSQLException e) {
@@ -28,7 +28,7 @@ public class EmplDepartService {
         }
     }
 
-    public List<EmplDepart> get(EmplDepart emplDepart) throws ResponseStatusException {
+    public List<EmplDepart> get(EmplDepart emplDepart) {
         try {
             return dao.find(emplDepart);
         } catch (NotFoundSQLException e) {
@@ -38,7 +38,7 @@ public class EmplDepartService {
         }
     }
 
-    public List<EmplDepart> getAll() throws ResponseStatusException {
+    public List<EmplDepart> getAll() {
         try {
             return dao.findAll();
         } catch (NotFoundSQLException e) {
@@ -48,7 +48,7 @@ public class EmplDepartService {
         }
     }
 
-    public void update(EmplDepart emplDepart) throws ResponseStatusException {
+    public void update(EmplDepart emplDepart) {
         try {
             dao.update(emplDepart);
         } catch (SQLException e) {
@@ -56,7 +56,7 @@ public class EmplDepartService {
         }
     }
 
-    public void remove(EmplDepart emplDepart) throws ResponseStatusException {
+    public void remove(EmplDepart emplDepart) {
         try {
             dao.delete(emplDepart);
         } catch (NotFoundSQLException e) {
@@ -66,7 +66,7 @@ public class EmplDepartService {
         }
     }
 
-    public void removeAll() throws ResponseStatusException {
+    public void removeAll() {
         try {
             dao.deleteAll();
         } catch (SQLException e) {

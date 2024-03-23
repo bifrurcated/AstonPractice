@@ -1,9 +1,10 @@
 package com.github.bufrurcated.astonpractice.errors;
 
-import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 public class EmplDepartNotFoundError extends ResponseStatusException {
     public EmplDepartNotFoundError() {
-        super(HttpServletResponse.SC_NOT_FOUND, "employee department not found");
+        super(HttpStatus.NOT_FOUND, "employee department not found");
     }
 }

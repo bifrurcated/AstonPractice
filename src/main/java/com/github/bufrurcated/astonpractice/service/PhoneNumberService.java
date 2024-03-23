@@ -18,7 +18,7 @@ public class PhoneNumberService {
         this.dao = dao;
     }
 
-    public void add(PhoneNumber phoneNumber) throws ResponseStatusException {
+    public void add(PhoneNumber phoneNumber) {
         try {
             dao.save(phoneNumber);
         } catch (EmployeeNotFoundSQLException e) {
@@ -28,7 +28,7 @@ public class PhoneNumberService {
         }
     }
 
-    public PhoneNumber getById(Long id) throws ResponseStatusException {
+    public PhoneNumber getById(Long id) {
         try {
             return dao.find(new FindNumber(id, null)).getFirst();
         } catch (NotFoundSQLException e) {
@@ -38,7 +38,7 @@ public class PhoneNumberService {
         }
     }
 
-    public List<PhoneNumber> getByEmployeeId(Long employeeId) throws ResponseStatusException {
+    public List<PhoneNumber> getByEmployeeId(Long employeeId) {
         try {
             return dao.find(new FindNumber(null, employeeId));
         } catch (NotFoundSQLException e) {
@@ -48,7 +48,7 @@ public class PhoneNumberService {
         }
     }
 
-    public List<PhoneNumber> getAll() throws ResponseStatusException {
+    public List<PhoneNumber> getAll() {
         try {
             return dao.findAll();
         } catch (NotFoundSQLException e) {
@@ -58,7 +58,7 @@ public class PhoneNumberService {
         }
     }
 
-    public void update(PhoneNumber phoneNumber) throws ResponseStatusException {
+    public void update(PhoneNumber phoneNumber) {
         try {
             dao.update(phoneNumber);
         } catch (SQLException e) {
@@ -66,7 +66,7 @@ public class PhoneNumberService {
         }
     }
 
-    public void removeById(Long id) throws ResponseStatusException {
+    public void removeById(Long id) {
         try {
             dao.delete(new FindNumber(id, null));
         } catch (NotFoundSQLException e) {
@@ -76,7 +76,7 @@ public class PhoneNumberService {
         }
     }
 
-    public void removeByEmployeeId(Long employeeId) throws ResponseStatusException {
+    public void removeByEmployeeId(Long employeeId) {
         try {
             dao.delete(new FindNumber(null, employeeId));
         } catch (NotFoundSQLException e) {
@@ -86,7 +86,7 @@ public class PhoneNumberService {
         }
     }
 
-    public void removeAll() throws ResponseStatusException {
+    public void removeAll() {
         try {
             dao.deleteAll();
         } catch (SQLException e) {
