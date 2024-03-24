@@ -24,6 +24,10 @@ public class HelloController {
             @RequestParam(value = "b", required = false) String b,
             @RequestParam(value = "action", required = false) String action,
             Model model) {
+        if (a == null || b == null || action == null) {
+            model.addAttribute("message", "Use request param a,b and action. Example: ?a=2&b=2&action=multiplication");
+            return "calculate";
+        }
         String symbolAction;
         BigDecimal result;
         final var decimalA = new BigDecimal(a);

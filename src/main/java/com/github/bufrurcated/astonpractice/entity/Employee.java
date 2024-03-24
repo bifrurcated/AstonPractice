@@ -23,6 +23,7 @@ public class Employee implements Serializable {
     private static final long serialVersionUID = 7825808328523472983L;
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "incrementor")
+    @SequenceGenerator(name="incrementor", sequenceName = "incrementor", allocationSize=1)
     private Long id;
     @Column(name = "first_name", nullable = false)
     private String firstName;
